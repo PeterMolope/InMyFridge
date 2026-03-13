@@ -38,7 +38,7 @@ export default function FridgeScreen() {
       alert("Please select some ingredients first");
       return;
     }
-    router.push("/recipes");
+    router.push("./recipes");
   };
 
   return (
@@ -60,7 +60,7 @@ export default function FridgeScreen() {
           <ChefHat size={24} color="white" />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => router.push("/add-item")}
+          onPress={() => router.push("./add-item")}
           className="bg-primary p-4 rounded-full"
         >
           <Plus size={24} color="white" />
