@@ -92,18 +92,6 @@ Contributions are welcome!
 3. Commit your changes
 4. Open a Pull Request
 
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
-
----
-
-⭐ If you like this project, consider **starring the repository**!
-
----
-
 If you'd like, I can also make a **much better “impressive GitHub README”** with:
 
 * badges (build, license, version)
