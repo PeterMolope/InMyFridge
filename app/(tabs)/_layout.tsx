@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { PlusCircle, Refrigerator, Utensils } from "lucide-react-native";
+import { ChefHat, PlusCircle, Refrigerator } from "lucide-react-native";
 import React from "react";
 
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
@@ -28,11 +28,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="recipes"
+        name="cook"
         options={{
-          title: "Recipes",
+          title: "Cook",
           tabBarIcon: ({ color }) => (
-            <Utensils size={28} color={color} />
+            <ChefHat size={28} color={color} />
           ),
         }}
       />
