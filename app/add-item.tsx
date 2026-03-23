@@ -1,7 +1,8 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 import IngredientAutocomplete from "../src/components/IngredientAutocomplete";
+import QuantityExpiryModal from "../src/components/QuantityExpiryModal";
 import { useFridgeStore } from "../src/context/fridgeStore";
 
 interface Ingredient {
@@ -11,24 +12,34 @@ interface Ingredient {
 }
 
 export default function AddItemScreen() {
-  const [name, setName] = useState("");
-  const [expirationDate, setExpirationDate] = useState("");
+  const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const { addItem } = useFridgeStore();
 
   const handleIngredientSelect = (ingredient: Ingredient) => {
-    setName(ingredient.name);
+    setSelectedIngredient(ingredient);
+    setShowModal(true);
   };
 
-  const handleAdd = () => {
-    if (!name.trim()) {
-      Alert.alert("Error", "Please enter an item name");
-      return;
-    }
-    const expDate = expirationDate ? new Date(expirationDate) : undefined;
-    addItem({ name: name.trim(), expirationDate: expDate });
-    setName("");
-    setExpirationDate("");
+  const handleModalConfirm = (quantity: number, expiryDate?: Date) => {
+    if (!selectedIngredient) return;
+
+    addItem({
+      name: selectedIngredient.name.trim(),
+      quantity,
+      expirationDate: expiryDate,
+      image: selectedIngredient.image,
+    });
+
+    // Reset state
+    setSelectedIngredient(null);
+    setShowModal(false);
     router.back();
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false);
+    setSelectedIngredient(null);
   };
 
   return (
@@ -43,19 +54,12 @@ export default function AddItemScreen() {
         className="mb-4"
       />
       
-      <TextInput
-        className="bg-card text-text p-3 rounded-lg mb-4 border border-border"
-        placeholder="Expiration date (YYYY-MM-DD)"
-        placeholderTextColor="#888"
-        value={expirationDate}
-        onChangeText={setExpirationDate}
+      <QuantityExpiryModal
+        visible={showModal}
+        onClose={handleModalClose}
+        onConfirm={handleModalConfirm}
+        ingredientName={selectedIngredient?.name || ''}
       />
-      <TouchableOpacity
-        onPress={handleAdd}
-        className="bg-primary p-4 rounded-lg"
-      >
-        <Text className="text-white text-center font-bold">Add Item</Text>
-      </TouchableOpacity>
     </View>
   );
 }

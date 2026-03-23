@@ -90,7 +90,16 @@ const FoodItemCard: React.FC<FoodItemCardProps> = ({
 
         {/* Food details */}
         <View className="flex-1 p-3">
-          <Text className="text-text text-lg font-bold mb-1">{item.name}</Text>
+          <View className="flex-row items-center mb-1">
+            <Text className="text-text text-lg font-bold">{item.name}</Text>
+            {item.quantity && (
+              <View className="ml-2 bg-primary/20 px-2 py-1 rounded-full">
+                <Text className="text-primary text-xs font-semibold">
+                  {item.quantity}x
+                </Text>
+              </View>
+            )}
+          </View>
           
           {/* Expiry badge */}
           {daysUntilExpiry !== null && (
