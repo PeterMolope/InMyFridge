@@ -1,14 +1,14 @@
+import { Calendar, Minus, Plus, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
   Alert,
+  Modal,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { X, Plus, Minus, Calendar } from 'lucide-react-native';
+import DateTimePicker from 'react-native-date-picker';
 
 interface QuantityExpiryModalProps {
   visible: boolean;
@@ -24,17 +24,10 @@ const QuantityExpiryModal: React.FC<QuantityExpiryModalProps> = ({
   ingredientName,
 }) => {
   const [quantity, setQuantity] = useState(1);
-  const [expiryDate, setExpiryDate] = useState<Date | undefined>();
+  const [expiryDate, setExpiryDate] = useState<Date | undefined>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [customQuantity, setCustomQuantity] = useState('');
   const [useCustomQuantity, setUseCustomQuantity] = useState(false);
-
-  const handleDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setExpiryDate(selectedDate);
-    }
-  };
 
   const incrementQuantity = () => {
     if (useCustomQuantity) {
@@ -71,7 +64,7 @@ const QuantityExpiryModal: React.FC<QuantityExpiryModalProps> = ({
     setQuantity(1);
     setCustomQuantity('');
     setUseCustomQuantity(false);
-    setExpiryDate(undefined);
+    setExpiryDate(new Date());
   };
 
   const handleClose = () => {
@@ -80,10 +73,10 @@ const QuantityExpiryModal: React.FC<QuantityExpiryModalProps> = ({
     setQuantity(1);
     setCustomQuantity('');
     setUseCustomQuantity(false);
-    setExpiryDate(undefined);
+    setExpiryDate(new Date());
   };
 
-  const formatExpiryDate = (date: Date) => {
+  const formatDateForDisplay = (date: Date) => {
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -194,7 +187,7 @@ const QuantityExpiryModal: React.FC<QuantityExpiryModalProps> = ({
               <View className="flex-row items-center">
                 <Calendar size={20} color="#6B7280" />
                 <Text className="text-text ml-3">
-                  {expiryDate ? formatExpiryDate(expiryDate) : 'Select expiry date'}
+                  {expiryDate ? formatDateForDisplay(expiryDate) : 'Select expiry date'}
                 </Text>
               </View>
               <Text className="text-secondary text-sm">Optional</Text>
@@ -222,11 +215,17 @@ const QuantityExpiryModal: React.FC<QuantityExpiryModalProps> = ({
       {/* Date Picker Modal */}
       {showDatePicker && (
         <DateTimePicker
-          value={expiryDate || new Date()}
+          date={expiryDate || new Date()}
           mode="date"
-          display="default"
-          onChange={handleDateChange}
+          onDateChange={(date: Date) => {
+            setExpiryDate(date);
+            setShowDatePicker(false);
+          }}
           minimumDate={new Date()}
+          title="Select expiry date"
+          confirmText="Confirm"
+          cancelText="Cancel"
+          theme="light"
         />
       )}
     </Modal>
