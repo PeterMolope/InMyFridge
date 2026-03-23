@@ -1,22 +1,23 @@
 import {
-    DarkTheme,
-    DefaultTheme,
-    ThemeProvider,
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from 'expo-status-bar';
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import "../global.css";
 
-import { useColorScheme } from "@/components/useColorScheme";
+import { ThemeProvider as CustomThemeProvider, useTheme } from "../src/context/ThemeContext";
 import { QueryProvider } from "../src/providers/QueryProvider";
 
 export {
-    // Catch any errors thrown by the Layout component.
-    ErrorBoundary
+  // Catch any errors thrown by the Layout component.
+  ErrorBoundary
 } from "expo-router";
 
 export const unstable_settings = {
@@ -49,17 +50,20 @@ export default function RootLayout() {
 
   return (
     <QueryProvider>
-      <RootLayoutNav />
+      <CustomThemeProvider>
+        <RootLayoutNav />
+      </CustomThemeProvider>
     </QueryProvider>
   );
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
+      <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: "modal" }} />

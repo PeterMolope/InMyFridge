@@ -109,7 +109,7 @@ const NeonButton: React.FC<NeonButtonProps> = ({
             ) : (
               <>
                 {icon && <View>{icon}</View>}
-                <Text className={`text-white ${getTextSize()} font-tech`}>
+                <Text className={`text-white ${getTextSize()}`}>
                   {title}
                 </Text>
               </>

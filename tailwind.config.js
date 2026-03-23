@@ -31,10 +31,6 @@ module.exports = {
         text: "#ffffff",
         border: "#333",
       },
-      fontFamily: {
-        tech: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
-      },
       boxShadow: {
         'neon-green': '0 0 20px #39FF14',
         'neon-cyan': '0 0 20px #00F3FF',

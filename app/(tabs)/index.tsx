@@ -1,3 +1,4 @@
+import { DarkModeToggle } from "@/src/components/DarkModeToggle";
 import FoodItemCard from "@/src/components/FoodItemCard";
 import { FoodItem, useFridgeStore } from "@/src/context/fridgeStore";
 import { router } from "expo-router";
@@ -34,7 +35,10 @@ export default function FridgeScreen() {
 
   return (
     <View className="flex-1 bg-background p-4">
-      <Text className="text-text text-2xl font-bold mb-4">My Fridge</Text>
+      <View className="flex-row justify-between items-center mb-4">
+        <Text className="text-text text-2xl font-bold">My Fridge</Text>
+        <DarkModeToggle />
+      </View>
       <FlatList
         data={items}
         keyExtractor={(item) => item.id}

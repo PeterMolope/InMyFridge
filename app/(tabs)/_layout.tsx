@@ -3,16 +3,24 @@ import { PlusCircle, Refrigerator, SoupIcon, UtensilsCrossed } from 'lucide-reac
 import React from "react";
 
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
-import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
+import { useTheme } from "@/src/context/ThemeContext";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
+        tabBarActiveTintColor: Colors[theme].tint,
+        tabBarInactiveTintColor: Colors[theme].tabIconDefault,
+        tabBarStyle: {
+          backgroundColor: Colors[theme].background,
+          borderTopColor: Colors[theme].border,
+        },
+        tabBarLabelStyle: {
+          color: Colors[theme].text,
+        },
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
