@@ -1,36 +1,27 @@
+import FoodItemCard from "@/src/components/FoodItemCard";
 import { FoodItem, useFridgeStore } from "@/src/context/fridgeStore";
 import { router } from "expo-router";
-import { Check, ChefHat, Circle, Plus, Square } from "lucide-react-native";
+import { ChefHat, Circle, Plus, Square } from "lucide-react-native";
 import React from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 
 export default function FridgeScreen() {
-  const { items, removeItem, selectedItems, toggleSelectItem } =
-    useFridgeStore();
+  const { items, removeItem, selectedItems, toggleSelectItem } = useFridgeStore();
+
+  const handleEat = (id: string) => {
+    // In a real app, you might want to track eaten items or show a confirmation
+    console.log(`Item ${id} marked as eaten`);
+    removeItem(id);
+  };
 
   const renderItem = ({ item }: { item: FoodItem }) => (
-    <View className="bg-card p-4 m-2 rounded-lg border border-border flex-row items-center">
-      <TouchableOpacity
-        onPress={() => toggleSelectItem(item.id)}
-        className="w-6 h-6 border border-primary rounded mr-4 items-center justify-center"
-      >
-        {selectedItems.includes(item.id) && <Check size={16} color="#4CAF50" />}
-      </TouchableOpacity>
-      <View className="flex-1">
-        <Text className="text-text text-lg font-bold">{item.name}</Text>
-        {item.expirationDate && (
-          <Text className="text-secondary">
-            Expires: {item.expirationDate.toDateString()}
-          </Text>
-        )}
-      </View>
-      <TouchableOpacity
-        onPress={() => removeItem(item.id)}
-        className="bg-danger p-2 rounded"
-      >
-        <Text className="text-white">Remove</Text>
-      </TouchableOpacity>
-    </View>
+    <FoodItemCard
+      item={item}
+      isSelected={selectedItems.includes(item.id)}
+      onSelect={toggleSelectItem}
+      onRemove={removeItem}
+      onEat={handleEat}
+    />
   );
 
   const handleGetRecipes = () => {
