@@ -1,12 +1,23 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
-import { useFridgeStore } from "@/src/context/fridgeStore";
 import { router } from "expo-router";
+import React, { useState } from "react";
+import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import IngredientAutocomplete from "../src/components/IngredientAutocomplete";
+import { useFridgeStore } from "../src/context/fridgeStore";
+
+interface Ingredient {
+  id: number;
+  name: string;
+  image?: string;
+}
 
 export default function AddItemScreen() {
   const [name, setName] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
   const { addItem } = useFridgeStore();
+
+  const handleIngredientSelect = (ingredient: Ingredient) => {
+    setName(ingredient.name);
+  };
 
   const handleAdd = () => {
     if (!name.trim()) {
@@ -25,13 +36,13 @@ export default function AddItemScreen() {
       <Text className="text-text text-2xl font-bold mb-4">
         Add Item to Fridge
       </Text>
-      <TextInput
-        className="bg-card text-text p-3 rounded-lg mb-4 border border-border"
-        placeholder="Item name"
-        placeholderTextColor="#888"
-        value={name}
-        onChangeText={setName}
+      
+      <IngredientAutocomplete
+        onIngredientSelect={handleIngredientSelect}
+        placeholder="Search or type ingredient name..."
+        className="mb-4"
       />
+      
       <TextInput
         className="bg-card text-text p-3 rounded-lg mb-4 border border-border"
         placeholder="Expiration date (YYYY-MM-DD)"
