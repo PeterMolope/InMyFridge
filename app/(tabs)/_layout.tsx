@@ -1,11 +1,10 @@
+import { Tabs } from "expo-router";
+import { PlusCircle, Refrigerator, Utensils } from "lucide-react-native";
 import React from "react";
-import { SymbolView } from "expo-symbols";
-import { Link, Tabs } from "expo-router";
-import { Platform, Pressable } from "react-native";
 
-import Colors from "@/constants/Colors";
-import { useColorScheme } from "@/components/useColorScheme";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
+import { useColorScheme } from "@/components/useColorScheme";
+import Colors from "@/constants/Colors";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -24,15 +23,7 @@ export default function TabLayout() {
         options={{
           title: "Fridge",
           tabBarIcon: ({ color }) => (
-            <SymbolView
-              name={{
-                ios: "refrigerator",
-                android: "kitchen",
-                web: "home",
-              }}
-              tintColor={color}
-              size={28}
-            />
+            <Refrigerator size={28} color={color} />
           ),
         }}
       />
@@ -41,15 +32,16 @@ export default function TabLayout() {
         options={{
           title: "Recipes",
           tabBarIcon: ({ color }) => (
-            <SymbolView
-              name={{
-                ios: "fork.knife",
-                android: "restaurant",
-                web: "cutlery",
-              }}
-              tintColor={color}
-              size={28}
-            />
+            <Utensils size={28} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="add-item"
+        options={{
+          title: "Add",
+          tabBarIcon: ({ color }) => (
+            <PlusCircle size={28} color={color} />
           ),
         }}
       />
