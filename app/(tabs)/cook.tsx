@@ -5,7 +5,7 @@ import RecipeSearch from '@/src/components/RecipeSearch';
 import { useFridgeStore } from '@/src/context/fridgeStore';
 import { Search, Soup } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, ListRenderItem, Text, TouchableOpacity, View } from 'react-native';
 
 export default function CookScreen() {
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
@@ -78,62 +78,92 @@ export default function CookScreen() {
   }
 
   // Show ingredient selection
-  return (
-    <ScrollView className="flex-1 bg-background">
-      <View className="p-4">
-        <View className="mb-6">
-          <View className="flex-row items-center mb-2">
-            <Soup size={28} color="#4CAF50" />
-            <Text className="text-2xl font-bold ml-3 text-text">What's Cooking?</Text>
-          </View>
-          <Text className="text-gray-600">
-            Select ingredients from your fridge that you want to cook with right now
-          </Text>
-        </View>
+  interface IngredientSelectionItem {
+    type: 'header' | 'selector' | 'button' | 'footer';
+  }
 
-        <IngredientMultiSelector
-          selectedIngredients={selectedIngredients}
-          onSelectionChange={setSelectedIngredients}
-          maxVisible={8}
-          showSearch={true}
-        />
+  const ingredientSelectionData: IngredientSelectionItem[] = [
+    { type: 'header' },
+    { type: 'selector' },
+    { type: 'button' },
+    { type: 'footer' }
+  ];
 
-        {/* Search Recipes button */}
-        <View className="mt-6 mb-8">
-          <TouchableOpacity
-            onPress={handleGetRecipes}
-            className={`py-4 rounded-lg items-center shadow-lg flex-row justify-center ${
-              selectedIngredients.length === 0 
-                ? 'bg-gray-300' 
-                : 'bg-primary'
-            }`}
-            disabled={selectedIngredients.length === 0}
-          >
-            <Search size={20} color={selectedIngredients.length === 0 ? '#9CA3AF' : 'white'} />
-            <Text className={`font-bold text-lg ml-2 ${
-              selectedIngredients.length === 0 ? 'text-gray-500' : 'text-white'
-            }`}>
-              Find Recipes ({selectedIngredients.length})
+  const renderIngredientSelectionItem: ListRenderItem<IngredientSelectionItem> = ({ item }) => {
+    switch (item.type) {
+      case 'header':
+        return (
+          <View className="mb-6">
+            <View className="flex-row items-center mb-2">
+              <Soup size={28} color="#4CAF50" />
+              <Text className="text-2xl font-bold ml-3 text-text">What's Cooking?</Text>
+            </View>
+            <Text className="text-gray-600">
+              Select ingredients from your fridge that you want to cook with right now
             </Text>
-          </TouchableOpacity>
-          
-          {selectedIngredients.length > 0 && (
-            <View className="mt-3 p-3 bg-green-50 rounded-lg">
-              <Text className="text-center text-green-700 font-medium">
-                Perfect! You have {selectedIngredients.length} ingredient{selectedIngredients.length !== 1 ? 's' : ''} selected
+          </View>
+        );
+      
+      case 'selector':
+        return (
+          <IngredientMultiSelector
+            selectedIngredients={selectedIngredients}
+            onSelectionChange={setSelectedIngredients}
+            maxVisible={8}
+            showSearch={true}
+          />
+        );
+      
+      case 'button':
+        return (
+          <View className="mt-6 mb-8">
+            <TouchableOpacity
+              onPress={handleGetRecipes}
+              className={`py-4 rounded-lg items-center shadow-lg flex-row justify-center ${
+                selectedIngredients.length === 0 
+                  ? 'bg-gray-300' 
+                  : 'bg-primary'
+              }`}
+              disabled={selectedIngredients.length === 0}
+            >
+              <Search size={20} color={selectedIngredients.length === 0 ? '#9CA3AF' : 'white'} />
+              <Text className={`font-bold text-lg ml-2 ${
+                selectedIngredients.length === 0 ? 'text-gray-500' : 'text-white'
+              }`}>
+                Find Recipes ({selectedIngredients.length})
               </Text>
-            </View>
-          )}
+            </TouchableOpacity>
+            
+            {selectedIngredients.length > 0 && (
+              <View className="mt-3 p-3 bg-green-50 rounded-lg">
+                <Text className="text-center text-green-700 font-medium">
+                  Perfect! You have {selectedIngredients.length} ingredient{selectedIngredients.length !== 1 ? 's' : ''} selected
+                </Text>
+              </View>
+            )}
 
-          {items.length === 0 && (
-            <View className="mt-6 p-4 bg-yellow-50 rounded-lg">
-              <Text className="text-center text-yellow-800">
-                Your fridge is empty! Add some ingredients first to start cooking.
-              </Text>
-            </View>
-          )}
-        </View>
-      </View>
-    </ScrollView>
+            {items.length === 0 && (
+              <View className="mt-6 p-4 bg-yellow-50 rounded-lg">
+                <Text className="text-center text-yellow-800">
+                  Your fridge is empty! Add some ingredients first to start cooking.
+                </Text>
+              </View>
+            )}
+          </View>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <FlatList
+      className="flex-1 bg-background"
+      data={ingredientSelectionData}
+      renderItem={renderIngredientSelectionItem}
+      keyExtractor={(item, index) => item.type + index}
+      contentContainerStyle={{ padding: 16 }}
+    />
   );
 }
