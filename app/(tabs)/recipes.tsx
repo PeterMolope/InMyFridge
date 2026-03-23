@@ -1,9 +1,9 @@
-import React from "react";
-import { View, Text, FlatList, TouchableOpacity, Image } from "react-native";
-import { useFridgeStore } from "@/src/context/fridgeStore";
 import { fetchRecipesByIngredients, Recipe } from "@/src/api/recipeApi";
+import { useFridgeStore } from "@/src/context/fridgeStore";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
+import React from "react";
+import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 
 export default function RecipesScreen() {
   const { selectedItems, items } = useFridgeStore();
@@ -18,7 +18,7 @@ export default function RecipesScreen() {
     error,
   } = useQuery({
     queryKey: ["recipes", selectedNames],
-    queryFn: () => fetchRecipesByIngredients(selectedNames),
+    queryFn: () => fetchRecipesByIngredients({ ingredients: selectedNames }),
     enabled: selectedNames.length > 0,
   });
 

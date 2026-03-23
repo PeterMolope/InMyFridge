@@ -3,7 +3,6 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -13,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import "../global.css";
 
 import { useColorScheme } from "@/components/useColorScheme";
+import { QueryProvider } from "../src/providers/QueryProvider";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -47,12 +47,10 @@ export default function RootLayout() {
     return null;
   }
 
-  const queryClient = new QueryClient();
-
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryProvider>
       <RootLayoutNav />
-    </QueryClientProvider>
+    </QueryProvider>
   );
 }
 
