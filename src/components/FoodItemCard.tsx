@@ -33,11 +33,11 @@ const FoodItemCard: React.FC<FoodItemCardProps> = ({
   const daysUntilExpiry = getDaysUntilExpiry();
   
   const getExpiryBadgeColor = () => {
-    if (daysUntilExpiry === null) return 'bg-gray-500';
-    if (daysUntilExpiry < 0) return 'bg-red-500';
-    if (daysUntilExpiry <= 3) return 'bg-orange-500';
-    if (daysUntilExpiry <= 7) return 'bg-yellow-500';
-    return 'bg-green-500';
+    if (daysUntilExpiry === null) return 'bg-gray-500/50';
+    if (daysUntilExpiry < 0) return 'bg-red-500/50 border border-red-500';
+    if (daysUntilExpiry <= 3) return 'bg-orange-500/50 border border-orange-500';
+    if (daysUntilExpiry <= 7) return 'bg-yellow-500/50 border border-yellow-500';
+    return 'bg-primary/20 border border-primary';
   };
 
   const getExpiryText = () => {
@@ -59,14 +59,18 @@ const FoodItemCard: React.FC<FoodItemCardProps> = ({
   };
 
   return (
-    <View className="bg-card m-2 rounded-lg border border-border overflow-hidden shadow-sm">
+    <View className="bg-card m-2 rounded-xl border border-white/18 shadow-glass overflow-hidden">
       <View className="flex-row">
         {/* Selection checkbox */}
         <TouchableOpacity
           onPress={() => onSelect(item.id)}
-          className="w-8 h-8 border border-primary rounded-l-lg items-center justify-center bg-white"
+          className={`w-8 h-8 rounded-l-lg items-center justify-center border-2 ${
+            isSelected 
+              ? 'bg-primary/20 border-primary shadow-neon-green' 
+              : 'border-white/18 bg-abyss-layer/50'
+          }`}
         >
-          {isSelected && <Check size={16} color="#4CAF50" />}
+          {isSelected && <Check size={16} color="#39FF14" />}
         </TouchableOpacity>
 
         {/* Food image or placeholder */}
@@ -76,13 +80,14 @@ const FoodItemCard: React.FC<FoodItemCardProps> = ({
             style={{ width: 80, height: 80 }}
             contentFit="cover"
             transition={200}
+            className="rounded-r-lg"
           />
         ) : (
           <View 
             style={{ width: 80, height: 80 }} 
-            className="bg-gray-200 items-center justify-center"
+            className="bg-abyss-layer/50 items-center justify-center border-r border-white/18"
           >
-            <Text className="text-gray-500 text-2xl font-bold">
+            <Text className="text-secondary text-2xl font-bold font-mono">
               {item.name.charAt(0).toUpperCase()}
             </Text>
           </View>
@@ -91,10 +96,10 @@ const FoodItemCard: React.FC<FoodItemCardProps> = ({
         {/* Food details */}
         <View className="flex-1 p-3">
           <View className="flex-row items-center mb-1">
-            <Text className="text-text text-lg font-bold">{item.name}</Text>
+            <Text className="text-white text-lg font-bold font-tech">{item.name}</Text>
             {item.quantity && (
-              <View className="ml-2 bg-primary/20 px-2 py-1 rounded-full">
-                <Text className="text-primary text-xs font-semibold">
+              <View className="ml-2 bg-secondary/20 px-2 py-1 rounded-full border border-secondary/50">
+                <Text className="text-secondary text-xs font-semibold font-tech">
                   {item.quantity}x
                 </Text>
               </View>
@@ -104,7 +109,7 @@ const FoodItemCard: React.FC<FoodItemCardProps> = ({
           {/* Expiry badge */}
           {daysUntilExpiry !== null && (
             <View className={`self-start px-2 py-1 rounded-full ${getExpiryBadgeColor()}`}>
-              <Text className="text-white text-xs font-semibold">
+              <Text className="text-white text-xs font-semibold font-tech">
                 {getExpiryText()}
               </Text>
             </View>
@@ -112,18 +117,18 @@ const FoodItemCard: React.FC<FoodItemCardProps> = ({
         </View>
 
         {/* Action buttons */}
-        <View className="flex-col">
+        <View className="flex-col space-y-2 p-2">
           <TouchableOpacity
             onPress={() => onEat(item.id)}
-            className="w-10 h-10 items-center justify-center bg-green-500/10"
+            className="w-10 h-10 items-center justify-center bg-primary/10 border border-primary/30 rounded-lg"
           >
-            <Utensils size={16} color="#10B981" />
+            <Utensils size={16} color="#39FF14" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => onRemove(item.id)}
-            className="w-10 h-10 items-center justify-center bg-red-500/10"
+            className="w-10 h-10 items-center justify-center bg-red-500/10 border border-red-500/30 rounded-lg"
           >
-            <Trash2 size={16} color="#EF4444" />
+            <Trash2 size={16} color="#FF00FF" />
           </TouchableOpacity>
         </View>
       </View>

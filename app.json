@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#050505"
     },
     "ios": {
       "supportsTablet": true,
@@ -31,7 +31,16 @@
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE"
-      ]
+      ],
+      "navigationBar": {
+        "visible": "transparent",
+        "barStyle": "light-content"
+      },
+      "statusBar": {
+        "backgroundColor": "#050505",
+        "barStyle": "light-content",
+        "translucent": false
+      }
     },
     "web": {
       "bundler": "metro",

@@ -8,13 +8,38 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#4CAF50",
-        secondary: "#757575",
-        accent: "#03DAC6",
-        background: "#121212",
-        card: "#1e1e1e",
+        // Abyss Palette
+        abyss: {
+          black: '#050505',
+          surface: '#121212',
+          layer: '#1a1a1a',
+        },
+        // Neon Colors
+        neon: {
+          green: '#39FF14',
+          cyan: '#00F3FF',
+          pink: '#FF00FF',
+          purple: '#9D00FF',
+          yellow: '#FFFF00',
+        },
+        // Legacy colors for compatibility
+        primary: "#39FF14",
+        secondary: "#00F3FF",
+        accent: "#FF00FF",
+        background: "#050505",
+        card: "#121212",
         text: "#ffffff",
         border: "#333",
+      },
+      fontFamily: {
+        tech: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+      boxShadow: {
+        'neon-green': '0 0 20px #39FF14',
+        'neon-cyan': '0 0 20px #00F3FF',
+        'neon-pink': '0 0 20px #FF00FF',
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
       },
     },
   },
