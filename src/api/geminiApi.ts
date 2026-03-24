@@ -30,7 +30,7 @@ export async function identifyFoodFromImage(
     }
 
     // Get the Gemini Vision model
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     let imageData: string;
     
@@ -91,7 +91,7 @@ export async function identifyFoodFromBase64(base64Data: string): Promise<FoodId
       throw new Error('Gemini API key is not configured');
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const image = {
       inlineData: {

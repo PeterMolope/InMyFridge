@@ -77,30 +77,29 @@ export default function CameraComponent({ onPhotoCapture, onClose }: CameraCompo
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing} ref={cameraRef}>
-        <View style={styles.overlay}>
-          <View style={styles.topControls}>
-            <TouchableOpacity style={styles.button} onPress={onClose}>
-              <Text style={styles.buttonText}>✕</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-              <Text style={styles.buttonText}>🔄</Text>
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.bottomControls}>
-            <TouchableOpacity style={styles.galleryButton} onPress={pickImage}>
-              <Text style={styles.buttonText}>📷</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
-              <View style={styles.captureInner} />
-            </TouchableOpacity>
-            
-            <View style={styles.placeholder} />
-          </View>
+      <CameraView style={styles.camera} facing={facing} ref={cameraRef} />
+      <View style={styles.overlay}>
+        <View style={styles.topControls}>
+          <TouchableOpacity style={styles.button} onPress={onClose}>
+            <Text style={styles.buttonText}>✕</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+            <Text style={styles.buttonText}>🔄</Text>
+          </TouchableOpacity>
         </View>
-      </CameraView>
+        
+        <View style={styles.bottomControls}>
+          <TouchableOpacity style={styles.galleryButton} onPress={pickImage}>
+            <Text style={styles.buttonText}>📷</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
+            <View style={styles.captureInner} />
+          </TouchableOpacity>
+          
+          <View style={styles.placeholder} />
+        </View>
+      </View>
     </View>
   );
 }
@@ -119,7 +118,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   overlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: 'space-between',
   },
   topControls: {
