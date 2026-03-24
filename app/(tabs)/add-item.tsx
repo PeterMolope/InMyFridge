@@ -1,22 +1,24 @@
 import { identifyFoodFromBase64 } from "@/src/api/geminiApi";
 import CameraComponent from "@/src/components/CameraComponent";
 import { useFridgeStore } from "@/src/context/fridgeStore";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Modal,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  Modal,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from "react-native";
 
 export default function AddItemScreen() {
   const [name, setName] = useState("");
-  const [expirationDate, setExpirationDate] = useState("");
+  const [expirationDate, setExpirationDate] = useState<Date | undefined>(undefined);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [isIdentifying, setIsIdentifying] = useState(false);
   const { addItem } = useFridgeStore();
@@ -26,10 +28,9 @@ export default function AddItemScreen() {
       Alert.alert("Error", "Please enter an item name");
       return;
     }
-    const expDate = expirationDate ? new Date(expirationDate) : undefined;
-    addItem({ name: name.trim(), expirationDate: expDate });
+    addItem({ name: name.trim(), expirationDate });
     setName("");
-    setExpirationDate("");
+    setExpirationDate(undefined);
     router.back();
   };
 
@@ -91,6 +92,22 @@ export default function AddItemScreen() {
     setShowCamera(false);
   };
 
+  const showDatepicker = () => {
+    setShowDatePicker(true);
+  };
+
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setExpirationDate(selectedDate);
+    }
+  };
+
+  const formatDateDisplay = (date: Date | undefined) => {
+    if (!date) return "";
+    return date.toISOString().split('T')[0]; // YYYY-MM-DD format
+  };
+
   return (
     <View className="flex-1 bg-background p-4">
       <Text className="text-text text-2xl font-bold mb-4">
@@ -116,13 +133,15 @@ export default function AddItemScreen() {
         value={name}
         onChangeText={setName}
       />
-      <TextInput
-        className="bg-card text-text p-3 rounded-lg mb-4 border border-border"
-        placeholder="Expiration date (YYYY-MM-DD)"
-        placeholderTextColor="#888"
-        value={expirationDate}
-        onChangeText={setExpirationDate}
-      />
+      <TouchableOpacity
+        onPress={showDatepicker}
+        className="bg-card text-text p-3 rounded-lg mb-4 border border-border flex-row justify-between items-center"
+      >
+        <Text className={expirationDate ? "text-text" : "text-gray-500"}>
+          {formatDateDisplay(expirationDate) || "Select expiration date"}
+        </Text>
+        <Text className="text-text text-lg">📅</Text>
+      </TouchableOpacity>
       <TouchableOpacity
         onPress={handleAdd}
         className="bg-primary p-4 rounded-lg"
@@ -140,6 +159,17 @@ export default function AddItemScreen() {
           onClose={closeCamera}
         />
       </Modal>
+
+      {showDatePicker && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={expirationDate || new Date()}
+          mode="date"
+          display="default"
+          onChange={onDateChange}
+          minimumDate={new Date()}
+        />
+      )}
     </View>
   );
 }
