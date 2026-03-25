@@ -1,11 +1,29 @@
+import { Platform } from 'react-native';
 
 export class SystemUIManager {
-  static setTheme(theme: 'light' | 'dark') {
-    // The StatusBar component from expo-status-bar handles this automatically
-    // We'll use the component in our layout instead
+  static setDarkMode() {
+    // Force dark mode throughout the app
+    // StatusBar styling is handled by the StatusBar component in layout
+    // This method exists for future Android navigation bar customization
   }
 
-  static getStatusBarStyle(theme: 'light' | 'dark'): 'light' | 'dark' {
-    return theme === 'dark' ? 'light' : 'dark';
+  static getStatusBarStyle(): 'light' | 'dark' {
+    return 'light'; // Always light content for dark theme
+  }
+
+  static getSafeAreaEdges() {
+    return ['top', 'left', 'right'] as const;
+  }
+
+  static getAndroidNavigationBarConfig() {
+    if (Platform.OS === 'android') {
+      return {
+        // Future Android navigation bar configuration
+        // Can be extended with expo-system-ui if needed
+        translucent: true,
+        style: 'light' as const,
+      };
+    }
+    return {};
   }
 }

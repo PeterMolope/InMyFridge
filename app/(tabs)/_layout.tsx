@@ -1,37 +1,30 @@
-import { Tabs } from "expo-router";
-import { PlusCircle, Refrigerator, SoupIcon, UtensilsCrossed } from 'lucide-react-native';
-import React from "react";
-
-import { useClientOnlyValue } from "@/components/useClientOnlyValue";
-import Colors from "@/constants/Colors";
-import { useTheme } from "@/src/context/ThemeContext";
+import { ChefHat, Home, Plus, Utensils } from '@/src/utils/icon-interop';
+import { Tabs } from 'expo-router';
+import { useColorScheme } from 'nativewind';
+import React from 'react';
 
 export default function TabLayout() {
-  const { theme } = useTheme();
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[theme].tint,
-        tabBarInactiveTintColor: Colors[theme].tabIconDefault,
+        headerShown: false,
         tabBarStyle: {
-          backgroundColor: Colors[theme].background,
-          borderTopColor: Colors[theme].border,
+          backgroundColor: '#0e0e0e',
+          borderTopColor: '#333',
         },
-        tabBarLabelStyle: {
-          color: Colors[theme].text,
-        },
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
+        tabBarActiveTintColor: '#8eff71',
+        tabBarInactiveTintColor: '#888888',
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: "Fridge",
-          tabBarIcon: ({ color }) => (
-            <Refrigerator size={28} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <Home className={focused ? 'text-[#8eff71]' : 'text-[#888888]'} size={24} />
           ),
         }}
       />
@@ -39,8 +32,8 @@ export default function TabLayout() {
         name="cook"
         options={{
           title: "Cook",
-          tabBarIcon: ({ color }) => (
-            <SoupIcon size={28} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <ChefHat className={focused ? 'text-[#8eff71]' : 'text-[#888888]'} size={24} />
           ),
         }}
       />
@@ -48,8 +41,8 @@ export default function TabLayout() {
         name="recipes"
         options={{
           title: "Recipes",
-          tabBarIcon: ({ color }) => (
-            <UtensilsCrossed size={28} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <Utensils className={focused ? 'text-[#8eff71]' : 'text-[#888888]'} size={24} />
           ),
         }}
       />
@@ -57,8 +50,8 @@ export default function TabLayout() {
         name="add-item"
         options={{
           title: "Add",
-          tabBarIcon: ({ color }) => (
-            <PlusCircle size={28} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <Plus className={focused ? 'text-[#8eff71]' : 'text-[#888888]'} size={24} />
           ),
         }}
       />

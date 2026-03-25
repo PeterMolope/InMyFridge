@@ -1,6 +1,5 @@
 import {
   DarkTheme,
-  DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
@@ -12,8 +11,9 @@ import "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import "../global.css";
 
-import { ThemeProvider as CustomThemeProvider, useTheme } from "../src/context/ThemeContext";
 import { QueryProvider } from "../src/providers/QueryProvider";
+import { THEME } from "../src/theme/theme";
+import { SystemUIManager } from "../src/utils/SystemUIManager";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -50,20 +50,24 @@ export default function RootLayout() {
 
   return (
     <QueryProvider>
-      <CustomThemeProvider>
-        <RootLayoutNav />
-      </CustomThemeProvider>
+      <RootLayoutNav />
     </QueryProvider>
   );
 }
 
 function RootLayoutNav() {
-  const { theme } = useTheme();
+  // Initialize system UI for dark mode
+  useEffect(() => {
+    SystemUIManager.setDarkMode();
+  }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
-      <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
+    <SafeAreaView 
+      style={{ flex: 1, backgroundColor: THEME.background }} 
+      edges={SystemUIManager.getSafeAreaEdges()}
+    >
+      <StatusBar style={SystemUIManager.getStatusBarStyle()} />
+      <ThemeProvider value={DarkTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: "modal" }} />
