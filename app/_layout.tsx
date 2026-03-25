@@ -1,19 +1,14 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from "react";
 import "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 import "../global.css";
 
 import { ThemeProvider as CustomThemeProvider, useTheme } from "../src/context/ThemeContext";
 import { QueryProvider } from "../src/providers/QueryProvider";
+import { FreshMintThemeProvider } from "../src/theme/index";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -61,14 +56,14 @@ function RootLayoutNav() {
   const { theme } = useTheme();
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
-      <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
+    <FreshMintThemeProvider>
+      <>
+        <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: "modal" }} />
         </Stack>
-      </ThemeProvider>
-    </SafeAreaView>
+      </>
+    </FreshMintThemeProvider>
   );
 }
