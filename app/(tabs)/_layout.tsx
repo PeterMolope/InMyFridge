@@ -1,64 +1,64 @@
-import { Tabs } from "expo-router";
-import { PlusCircle, Refrigerator, SoupIcon, UtensilsCrossed } from 'lucide-react-native';
-import React from "react";
+import { Tabs } from 'expo-router';
+import { BookOpen, Refrigerator, ShoppingCart, User } from 'lucide-react-native';
+import { cssInterop, useColorScheme } from 'nativewind';
+import React from 'react';
 
-import { useClientOnlyValue } from "@/components/useClientOnlyValue";
-import Colors from "@/constants/Colors";
-import { useTheme } from "@/src/context/ThemeContext";
+// Enable className styling for icons
+cssInterop(Refrigerator, { className: { target: 'style', nativeStyleToProp: { color: true } } });
+cssInterop(BookOpen, { className: { target: 'style', nativeStyleToProp: { color: true } } });
+cssInterop(ShoppingCart, { className: { target: 'style', nativeStyleToProp: { color: true } } });
+cssInterop(User, { className: { target: 'style', nativeStyleToProp: { color: true } } });
 
 export default function TabLayout() {
-  const { theme } = useTheme();
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
+  // Fresh mint theme colors
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[theme].tint,
-        tabBarInactiveTintColor: Colors[theme].tabIconDefault,
+        headerShown: false,
         tabBarStyle: {
-          backgroundColor: Colors[theme].background,
-          borderTopColor: Colors[theme].border,
+          backgroundColor: isDark ? '#1a1a1a' : '#ffffff',
+          borderTopColor: isDark ? '#333333' : '#e5e5e5',
         },
-        tabBarLabelStyle: {
-          color: Colors[theme].text,
-        },
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
+        tabBarActiveTintColor: '#14B8A6',
+        tabBarInactiveTintColor: isDark ? '#888888' : '#999999',
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Fridge",
-          tabBarIcon: ({ color }) => (
-            <Refrigerator size={28} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="cook"
-        options={{
-          title: "Cook",
-          tabBarIcon: ({ color }) => (
-            <SoupIcon size={28} color={color} />
+          title: 'Fridge',
+          tabBarIcon: ({ focused }) => (
+            <Refrigerator className={focused ? 'text-primary' : 'text-muted-foreground'} size={24} />
           ),
         }}
       />
       <Tabs.Screen
         name="recipes"
         options={{
-          title: "Recipes",
-          tabBarIcon: ({ color }) => (
-            <UtensilsCrossed size={28} color={color} />
+          title: 'Recipes',
+          tabBarIcon: ({ focused }) => (
+            <BookOpen className={focused ? 'text-primary' : 'text-muted-foreground'} size={24} />
           ),
         }}
       />
       <Tabs.Screen
         name="add-item"
         options={{
-          title: "Add",
-          tabBarIcon: ({ color }) => (
-            <PlusCircle size={28} color={color} />
+          title: 'Add',
+          tabBarIcon: ({ focused }) => (
+            <ShoppingCart className={focused ? 'text-primary' : 'text-muted-foreground'} size={24} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="cook"
+        options={{
+          title: 'Cook',
+          tabBarIcon: ({ focused }) => (
+            <User className={focused ? 'text-primary' : 'text-muted-foreground'} size={24} />
           ),
         }}
       />
