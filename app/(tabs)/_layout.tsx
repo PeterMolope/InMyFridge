@@ -4,22 +4,19 @@ import React from "react";
 
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import Colors from "@/constants/Colors";
-import { useTheme } from "@/src/context/ThemeContext";
 
 export default function TabLayout() {
-  const { theme } = useTheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[theme].tint,
-        tabBarInactiveTintColor: Colors[theme].tabIconDefault,
+        tabBarActiveTintColor: Colors.neon.green,
+        tabBarInactiveTintColor: Colors.border,
         tabBarStyle: {
-          backgroundColor: Colors[theme].background,
-          borderTopColor: Colors[theme].border,
+          backgroundColor: Colors.abyss.surface,
+          borderTopColor: Colors.border,
         },
         tabBarLabelStyle: {
-          color: Colors[theme].text,
+          color: Colors.text,
         },
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.

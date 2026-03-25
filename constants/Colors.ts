@@ -1,34 +1,35 @@
-const tintColorLight = "#2f95dc";
-const tintColorDark = "#4CAF50"; // Green for fridge theme
-
+// Neon Color Palette from Tailwind config
 export default {
-  light: {
-    text: "#000",
-    background: "#fff",
-    tint: tintColorLight,
-    tabIconDefault: "#ccc",
-    tabIconSelected: tintColorLight,
-    card: "#f8f9fa",
-    border: "#e9ecef",
-    primary: "#007bff",
-    secondary: "#6c757d",
-    success: "#28a745",
-    warning: "#ffc107",
-    danger: "#dc3545",
+  // Abyss Palette - Dark surfaces
+  abyss: {
+    black: '#050505',
+    surface: '#121212',
+    layer: '#1a1a1a',
   },
-  dark: {
-    text: "#ffffff",
-    background: "#121212", // Dark background
-    tint: tintColorDark,
-    tabIconDefault: "#888",
-    tabIconSelected: tintColorDark,
-    card: "#1e1e1e",
-    border: "#333",
-    primary: "#4CAF50", // Green
-    secondary: "#757575",
-    success: "#4CAF50",
-    warning: "#FF9800",
-    danger: "#F44336",
-    accent: "#03DAC6", // Teal accent
+  // Neon Colors for cyber-neon theme
+  neon: {
+    green: '#39FF14',
+    cyan: '#00F3FF',
+    pink: '#FF00FF',
+    purple: '#9D00FF',
+    yellow: '#FFFF00',
+  },
+  // Legacy colors for compatibility
+  primary: '#39FF14',
+  secondary: '#00F3FF',
+  accent: '#FF00FF',
+  background: '#050505',
+  card: '#121212',
+  text: '#ffffff',
+  border: '#333',
+  // UI specific colors
+  success: '#39FF14',
+  warning: '#FFFF00',
+  danger: '#FF00FF',
+  info: '#00F3FF',
+  // Glass effect colors
+  glass: {
+    background: 'rgba(26, 26, 26, 0.8)',
+    border: 'rgba(57, 255, 20, 0.3)',
   },
 };
