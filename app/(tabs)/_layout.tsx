@@ -1,51 +1,26 @@
+import Colors from '@/constants/Colors';
 import { Tabs } from 'expo-router';
 import { BookOpen, Refrigerator, ShoppingCart, User } from 'lucide-react-native';
-import { cssInterop, useColorScheme } from 'nativewind';
-import React from 'react';
+import { cssInterop } from 'nativewind';
 
-<<<<<<< HEAD
-import { useClientOnlyValue } from "@/components/useClientOnlyValue";
-import Colors from "@/constants/Colors";
-
-export default function TabLayout() {
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors.neon.green,
-        tabBarInactiveTintColor: Colors.border,
-        tabBarStyle: {
-          backgroundColor: Colors.abyss.surface,
-          borderTopColor: Colors.border,
-        },
-        tabBarLabelStyle: {
-          color: Colors.text,
-        },
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-=======
 // Enable className styling for icons
 cssInterop(Refrigerator, { className: { target: 'style', nativeStyleToProp: { color: true } } });
 cssInterop(BookOpen, { className: { target: 'style', nativeStyleToProp: { color: true } } });
 cssInterop(ShoppingCart, { className: { target: 'style', nativeStyleToProp: { color: true } } });
 cssInterop(User, { className: { target: 'style', nativeStyleToProp: { color: true } } });
 
-export default function TabLayout() {
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
-
-  // Fresh mint theme colors
+export default function TabsLayout() {
+  // Cyber-neon theme colors
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: isDark ? '#1a1a1a' : '#ffffff',
-          borderTopColor: isDark ? '#333333' : '#e5e5e5',
+          backgroundColor: Colors.abyss.surface,
+          borderTopColor: Colors.border,
         },
-        tabBarActiveTintColor: '#14B8A6',
-        tabBarInactiveTintColor: isDark ? '#888888' : '#999999',
->>>>>>> 031a0da17b310d30c5e459207adb6384aa5dfc04
+        tabBarActiveTintColor: Colors.neon.green,
+        tabBarInactiveTintColor: Colors.border,
       }}
     >
       <Tabs.Screen
@@ -53,7 +28,7 @@ export default function TabLayout() {
         options={{
           title: 'Fridge',
           tabBarIcon: ({ focused }) => (
-            <Refrigerator className={focused ? 'text-primary' : 'text-muted-foreground'} size={24} />
+            <Refrigerator className={focused ? 'text-neon-green' : 'text-border'} size={24} />
           ),
         }}
       />
@@ -62,25 +37,25 @@ export default function TabLayout() {
         options={{
           title: 'Recipes',
           tabBarIcon: ({ focused }) => (
-            <BookOpen className={focused ? 'text-primary' : 'text-muted-foreground'} size={24} />
+            <BookOpen className={focused ? 'text-neon-green' : 'text-border'} size={24} />
           ),
         }}
       />
       <Tabs.Screen
-        name="add-item"
+        name="shopping"
         options={{
-          title: 'Add',
+          title: 'Shopping',
           tabBarIcon: ({ focused }) => (
-            <ShoppingCart className={focused ? 'text-primary' : 'text-muted-foreground'} size={24} />
+            <ShoppingCart className={focused ? 'text-neon-green' : 'text-border'} size={24} />
           ),
         }}
       />
       <Tabs.Screen
-        name="cook"
+        name="profile"
         options={{
-          title: 'Cook',
+          title: 'Profile',
           tabBarIcon: ({ focused }) => (
-            <User className={focused ? 'text-primary' : 'text-muted-foreground'} size={24} />
+            <User className={focused ? 'text-neon-green' : 'text-border'} size={24} />
           ),
         }}
       />

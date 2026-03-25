@@ -8,6 +8,7 @@ export interface FoodItem {
   expirationDate?: Date;
   category?: string;
   quantity?: number;
+  unit?: string;
   image?: string;
 }
 

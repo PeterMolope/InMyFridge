@@ -1,24 +1,151 @@
 import { FoodItem, useFridgeStore } from "@/src/context/fridgeStore";
 import { router } from "expo-router";
-import { Brain, Camera, Package, Settings, UtensilsCrossed, X } from "lucide-react-native";
-import { cssInterop } from "nativewind";
-import React from "react";
-import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { AlertTriangle, CheckCircle, Clock, Filter, Plus, Search } from 'lucide-react-native';
+import { cssInterop } from 'nativewind';
+import React, { useState } from 'react';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Enable className styling for icons
-cssInterop(Camera, { className: { target: 'style', nativeStyleToProp: { color: true } } });
-cssInterop(Package, { className: { target: 'style', nativeStyleToProp: { color: true } } });
-cssInterop(Brain, { className: { target: 'style', nativeStyleToProp: { color: true } } });
-cssInterop(UtensilsCrossed, { className: { target: 'style', nativeStyleToProp: { color: true } } });
-cssInterop(Settings, { className: { target: 'style', nativeStyleToProp: { color: true } } });
-cssInterop(X, { className: { target: 'style', nativeStyleToProp: { color: true } } });
+cssInterop(Plus, { className: { target: 'style', nativeStyleToProp: { color: true } } });
+cssInterop(Search, { className: { target: 'style', nativeStyleToProp: { color: true } } });
+cssInterop(Filter, { className: { target: 'style', nativeStyleToProp: { color: true } } });
+cssInterop(Clock, { className: { target: 'style', nativeStyleToProp: { color: true } } });
+cssInterop(AlertTriangle, { className: { target: 'style', nativeStyleToProp: { color: true } } });
+cssInterop(CheckCircle, { className: { target: 'style', nativeStyleToProp: { color: true } } });
 
-export default function FridgeScreen() {
-  const { items, removeItem, selectedItems, toggleSelectItem } = useFridgeStore();
+const mockItems: FoodItem[] = [
+  {
+    id: '1',
+    name: 'Fresh Milk',
+    category: 'Dairy',
+    quantity: 1,
+    unit: 'gallon',
+    image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400&auto=format&fit=crop&q=60',
+    expirationDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+  },
+  {
+    id: '2',
+    name: 'Chicken Breast',
+    category: 'Meat',
+    quantity: 2,
+    unit: 'lbs',
+    image: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=400&auto=format&fit=crop&q=60',
+    expirationDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+  },
+  {
+    id: '3',
+    name: 'Greek Yogurt',
+    category: 'Dairy',
+    quantity: 3,
+    unit: 'cups',
+    image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&auto=format&fit=crop&q=60',
+    expirationDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+  },
+  {
+    id: '4',
+    name: 'Avocados',
+    category: 'Produce',
+    quantity: 4,
+    unit: 'pieces',
+    image: 'https://images.unsplash.com/photo-1523049673856-3888e81c8b31?w=400&auto=format&fit=crop&q=60',
+    expirationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  },
+  {
+    id: '5',
+    name: 'Cheddar Cheese',
+    category: 'Dairy',
+    quantity: 1,
+    unit: 'block',
+    image: 'https://images.unsplash.com/photo-1618164436241-4473940d1f5c?w=400&auto=format&fit=crop&q=60',
+    expirationDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+  },
+  {
+    id: '6',
+    name: 'Fresh Eggs',
+    category: 'Dairy',
+    quantity: 12,
+    unit: 'pieces',
+    image: 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400&auto=format&fit=crop&q=60',
+    expirationDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+  },
+];
 
-  const handleEat = (id: string) => {
-    console.log(`Item ${id} marked as eaten`);
-    removeItem(id);
+export default function FridgeHomeScreen() {
+  const { items, selectedItems, toggleSelectItem } = useFridgeStore();
+  const [selectedFilter, setSelectedFilter] = useState<'all' | 'fresh' | 'expiring-soon' | 'expired'>('all');
+  
+  // Use mock items if store is empty
+  const displayItems = items.length > 0 ? items : mockItems;
+
+  const getItemStatus = (item: FoodItem) => {
+    if (!item.expirationDate) return 'fresh';
+    
+    // Convert string to Date if needed
+    const expiryDate = typeof item.expirationDate === 'string' 
+      ? new Date(item.expirationDate) 
+      : item.expirationDate;
+    
+    if (!(expiryDate instanceof Date) || isNaN(expiryDate.getTime())) return 'fresh';
+    
+    const today = new Date();
+    const diffTime = expiryDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) return 'expired';
+    if (diffDays <= 3) return 'expiring-soon';
+    return 'fresh';
+  };
+
+  const getDaysUntilExpiry = (item: FoodItem) => {
+    if (!item.expirationDate) return 999;
+    
+    // Convert string to Date if needed
+    const expiryDate = typeof item.expirationDate === 'string' 
+      ? new Date(item.expirationDate) 
+      : item.expirationDate;
+    
+    if (!(expiryDate instanceof Date) || isNaN(expiryDate.getTime())) return 999;
+    
+    const today = new Date();
+    const diffTime = expiryDate.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  const filteredItems = displayItems.filter(item => {
+    const status = getItemStatus(item);
+    return selectedFilter === 'all' || status === selectedFilter;
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'fresh':
+        return 'bg-green-500';
+      case 'expiring-soon':
+        return 'bg-orange-500';
+      case 'expired':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'fresh':
+        return 'Fresh';
+      case 'expiring-soon':
+        return 'Expiring Soon';
+      case 'expired':
+        return 'Expired';
+      default:
+        return 'Unknown';
+    }
+  };
+
+  const stats = {
+    total: displayItems.length,
+    expiringSoon: displayItems.filter(i => getItemStatus(i) === 'expiring-soon').length,
+    expired: displayItems.filter(i => getItemStatus(i) === 'expired').length,
   };
 
   const handleGetRecipes = () => {
@@ -29,223 +156,317 @@ export default function FridgeScreen() {
     router.push({ pathname: "/(tabs)/recipes" });
   };
 
-  const getCategoryCount = (category: string) => {
-    return items.filter(item => item.category === category).length;
-  };
-
-  const getCategoryItems = (category: string) => {
-    return items.filter(item => item.category === category);
-  };
-
-  const formatDate = (date?: Date) => {
-    if (!date) return "No expiry";
-    return date.toLocaleDateString('en-US', { 
-      day: 'numeric', 
-      month: 'short' 
-    }).toUpperCase();
-  };
-
-  const isExpiringSoon = (date?: Date) => {
-    if (!date) return false;
-    const today = new Date();
-    const diffTime = date.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays <= 1;
-  };
-
-  const renderFoodItem = (item: FoodItem) => (
-    <View className="glass-card neon-border rounded-xl p-4 flex-row items-center gap-4 mb-4">
-      <View className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border border-outline-variant/20">
-        {item.image ? (
-          <Image 
-            source={{ uri: item.image }} 
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <View className="w-full h-full bg-surface-variant/50 flex items-center justify-center">
-            <Package size={24} className="text-on-surface-variant/50" />
+  return (
+    <SafeAreaView 
+      style={{
+        flex: 1,
+        backgroundColor: '#050505'
+      }}
+      edges={['top', 'left', 'right']}
+    >
+      {/* Header */}
+      <View style={{
+        paddingHorizontal: 24,
+        paddingVertical: 16
+      }}>
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 24
+        }}>
+          <View>
+            <Text style={{ color: '#39FF14', opacity: 0.6, fontSize: 14 }}>Welcome back,</Text>
+            <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#ffffff', letterSpacing: -1 }}>My Fridge</Text>
           </View>
-        )}
-      </View>
-      <View className="flex-grow">
-        <View className="flex-row justify-between items-start">
-          <Text className="font-bold text-lg text-on-surface tracking-tight capitalize">
-            {item.name}
-          </Text>
-          <TouchableOpacity
-            onPress={() => toggleSelectItem(item.id)}
-            className="w-5 h-5 border border-primary/40 rounded-sm bg-transparent flex items-center justify-center"
+        </View>
+
+        {/* Stats Cards */}
+        <View style={{
+          flexDirection: 'row',
+          gap: 12,
+          marginBottom: 24
+        }}>
+          <View style={{
+            flex: 1,
+            backgroundColor: 'rgba(26, 26, 26, 0.8)',
+            borderRadius: 16,
+            padding: 16,
+            borderWidth: 1,
+            borderColor: 'rgba(57, 255, 20, 0.3)'
+          }}>
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 8,
+              marginBottom: 8
+            }}>
+              <View style={{
+                width: 8,
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: '#39FF14'
+              }} />
+              <Text style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.6)' }}>Total Items</Text>
+            </View>
+            <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#ffffff' }}>{stats.total}</Text>
+          </View>
+          <View style={{
+            flex: 1,
+            backgroundColor: 'rgba(26, 26, 26, 0.8)',
+            borderRadius: 16,
+            padding: 16,
+            borderWidth: 1,
+            borderColor: 'rgba(57, 255, 20, 0.3)'
+          }}>
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 8,
+              marginBottom: 8
+            }}>
+              <View style={{
+                width: 8,
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: '#f97316'
+              }} />
+              <Text style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.6)' }}>Expiring</Text>
+            </View>
+            <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#ffffff' }}>{stats.expiringSoon}</Text>
+          </View>
+          <View style={{
+            flex: 1,
+            backgroundColor: 'rgba(26, 26, 26, 0.8)',
+            borderRadius: 16,
+            padding: 16,
+            borderWidth: 1,
+            borderColor: 'rgba(57, 255, 20, 0.3)'
+          }}>
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 8,
+              marginBottom: 8
+            }}>
+              <View style={{
+                width: 8,
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: '#ef4444'
+              }} />
+              <Text style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.6)' }}>Expired</Text>
+            </View>
+            <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#ffffff' }}>{stats.expired}</Text>
+          </View>
+        </View>
+
+        {/* Search Bar */}
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 12,
+          marginBottom: 16
+        }}>
+          <View style={{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: 'rgba(26, 26, 26, 0.8)',
+            borderRadius: 12,
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            gap: 12,
+            borderWidth: 1,
+            borderColor: 'rgba(57, 255, 20, 0.3)'
+          }}>
+            <Search color="rgba(255, 255, 255, 0.6)" size={20} />
+            <Text style={{ color: 'rgba(255, 255, 255, 0.6)', flex: 1 }}>Search items...</Text>
+          </View>
+          <TouchableOpacity 
+            style={{
+              backgroundColor: 'rgba(26, 26, 26, 0.8)',
+              borderRadius: 12,
+              padding: 12,
+              borderWidth: 1,
+              borderColor: 'rgba(57, 255, 20, 0.3)'
+            }}
           >
-            {selectedItems.includes(item.id) && (
-              <View className="w-full h-full bg-primary rounded-sm flex items-center justify-center">
-                <Text className="text-xs text-on-primary font-bold">✓</Text>
-              </View>
-            )}
+            <Filter color="#ffffff" size={20} />
           </TouchableOpacity>
         </View>
-        <View className="flex-row gap-3 mt-1">
-          <View className="px-2 py-0.5 bg-secondary-container/30 rounded-full border border-secondary/20">
-            <Text className="text-[9px] font-bold uppercase tracking-widest text-secondary">
-              {item.category || 'OTHER'}
-            </Text>
+
+        {/* Filter Tabs */}
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          style={{ marginBottom: 16 }}
+          contentContainerStyle={{ gap: 8 }}
+        >
+          <View style={{
+            flexDirection: 'row',
+            gap: 8
+          }}>
+            {(['all', 'fresh', 'expiring-soon', 'expired'] as const).map((filter) => (
+              <TouchableOpacity
+                key={filter}
+                onPress={() => setSelectedFilter(filter)}
+                style={{
+                  paddingHorizontal: 16,
+                  paddingVertical: 8,
+                  borderRadius: 20,
+                  backgroundColor: selectedFilter === filter ? '#39FF14' : 'rgba(26, 26, 26, 0.8)',
+                  borderWidth: 1,
+                  borderColor: 'rgba(57, 255, 20, 0.3)'
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: '500',
+                    color: selectedFilter === filter ? '#000000' : '#ffffff'
+                  }}
+                >
+                  {filter === 'expiring-soon' ? 'Expiring Soon' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
-          <Text className={`text-[9px] font-bold self-center ${
-            isExpiringSoon(item.expirationDate) ? 'text-error' : 'text-on-surface-variant'
-          }`}>
-            EXP: {formatDate(item.expirationDate)}
-          </Text>
-        </View>
+        </ScrollView>
       </View>
-    </View>
-  );
 
-  return (
-    <View className="flex-1 bg-surface-container-lowest">
-      {/* Top Navigation */}
-      <View className="fixed top-0 w-full flex-row justify-between items-center px-6 py-4 bg-black/40 z-50">
-        <View className="flex-row items-center gap-3">
-          <View className="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-outline-variant/30">
-            <Image 
-              source={{ uri: 'https://via.placeholder.com/40' }} 
-              className="w-full h-full object-cover"
-            />
-          </View>
-          <Text className="text-xl font-bold text-primary tracking-[0.2em] uppercase">
-            InMyFridge
-          </Text>
-        </View>
-        <TouchableOpacity className="w-10 h-10 flex items-center justify-center text-primary">
-          <Camera size={24} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Main Content */}
-      <ScrollView className="pt-24 pb-32 px-6" showsVerticalScrollIndicator={false}>
-        {/* Hero Section */}
-        <View className="mb-10">
-          <View className="flex-row justify-between items-end mb-4">
-            <View>
-              <Text className="text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1">
-                Current Inventory
-              </Text>
-              <Text className="text-4xl font-bold tracking-tighter text-on-surface">
-                Virtual Shelf
-              </Text>
-            </View>
-            <View className="items-end">
-              <Text className="text-[10px] font-bold uppercase tracking-widest text-primary">
-                {items.length} Items Total
-              </Text>
-              <View className="h-1 w-24 bg-surface-variant mt-2 rounded-full overflow-hidden">
-                <View className="h-full bg-primary w-3/4 shadow-lg shadow-primary/50" />
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* Search Terminal */}
-        <View className="relative mb-8">
-          <View className="absolute inset-y-0 left-0 pl-3 flex items-center">
-            <Text className="text-on-surface-variant text-sm">🔍</Text>
-          </View>
-          <TextInput
-            placeholder="QUERY DATABASE..."
-            placeholderTextColor="rgb(var(--outline))"
-            className="w-full bg-transparent border-b border-outline/50 py-3 pl-10 text-xs font-bold tracking-widest text-on-surface"
-          />
-          <View className="absolute bottom-0 left-0 h-[1px] w-0 bg-primary" />
-        </View>
-
-        {/* Inventory List */}
-        {items.length === 0 ? (
-          <View className="flex-1 items-center justify-center py-20">
-            <View className="relative mb-8">
-              <Package className="text-muted-foreground" size={120} />
-            </View>
-            <Text className="text-2xl font-bold mb-2 text-center text-on-surface">
-              Your fridge is lonely
-            </Text>
-            <Text className="text-muted-foreground text-lg mb-8 text-center px-8">
-              Start adding ingredients to keep track of your food and get recipe suggestions!
-            </Text>
+      {/* Items Grid */}
+      <ScrollView
+        contentContainerStyle={{ 
+          paddingHorizontal: 24, 
+          paddingBottom: 128, 
+          gap: 12 
+        }}
+      >
+        {filteredItems.map((item) => {
+          const status = getItemStatus(item);
+          const daysUntilExpiry = getDaysUntilExpiry(item);
+          
+          return (
             <TouchableOpacity
-              onPress={() => router.push({ pathname: "/add-item" })}
-              className="bg-primary px-8 py-4 rounded-full flex-row items-center"
+              key={item.id}
+              onPress={() => toggleSelectItem(item.id)}
+              style={{
+                backgroundColor: 'rgba(26, 26, 26, 0.8)',
+                borderRadius: 16,
+                overflow: 'hidden',
+                borderWidth: 1,
+                borderColor: selectedItems.includes(item.id) ? '#39FF14' : 'rgba(57, 255, 20, 0.3)'
+              }}
             >
-              <Text className="text-on-primary font-bold ml-2">Add Your First Item</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View className="space-y-4">
-            {/* Group by category */}
-            {['PROTEIN', 'VEGGIES', 'DAIRY', 'FRUITS', 'OTHER'].map((category) => {
-              const categoryItems = getCategoryItems(category);
-              if (categoryItems.length === 0) return null;
-              
-              return (
-                <View key={category}>
-                  {/* Category Header */}
-                  <View className="flex-row items-center gap-4 py-2">
-                    <Text className="text-[10px] font-bold text-primary-dim tracking-widest">
-                      {category} [{categoryItems.length}]
-                    </Text>
-                    <View className="h-[1px] flex-1 bg-outline-variant/20" />
+              <View style={{ flexDirection: 'row' }}>
+                <Image
+                  source={{ uri: item.image || 'https://via.placeholder.com/100' }}
+                  style={{ width: 96, height: 96 }}
+                  resizeMode="cover"
+                />
+                <View style={{ flex: 1, padding: 16 }}>
+                  <View style={{
+                    flexDirection: 'row',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    marginBottom: 8
+                  }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 18, fontWeight: '600', color: '#ffffff', marginBottom: 4 }}>
+                        {item.name}
+                      </Text>
+                      <Text style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.6)' }}>
+                        {item.quantity} {item.unit} · {item.category}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderRadius: 20,
+                        backgroundColor: status === 'fresh' ? '#22c55e' : status === 'expiring-soon' ? '#f97316' : '#ef4444'
+                      }}
+                    >
+                      <Text style={{ fontSize: 12, fontWeight: '500', color: '#ffffff' }}>
+                        {getStatusText(status)}
+                      </Text>
+                    </View>
                   </View>
-                  
-                  {/* Category Items */}
-                  {categoryItems.map(renderFoodItem)}
+                  <View style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 8,
+                    marginTop: 8
+                  }}>
+                    {status === 'fresh' ? (
+                      <CheckCircle color="#22c55e" size={16} />
+                    ) : status === 'expiring-soon' ? (
+                      <Clock color="#f97316" size={16} />
+                    ) : (
+                      <AlertTriangle color="#ef4444" size={16} />
+                    )}
+                    <Text style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.6)' }}>
+                      {status === 'fresh'
+                        ? `Expires in ${daysUntilExpiry} days` 
+                        : status === 'expiring-soon'
+                        ? `Expires in ${daysUntilExpiry} days` 
+                        : 'Expired'}
+                    </Text>
+                  </View>
                 </View>
-              );
-            })}
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+
+        {selectedItems.length > 0 && (
+          <View style={{
+            backgroundColor: '#39FF14',
+            borderRadius: 16,
+            padding: 16,
+            marginTop: 16
+          }}>
+            <Text style={{ color: '#000000', fontWeight: '600', marginBottom: 8 }}>
+              {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
+            </Text>
+            <Text style={{ color: 'rgba(0, 0, 0, 0.8)', fontSize: 14, marginBottom: 12 }}>
+              Find recipes with these ingredients
+            </Text>
+            <TouchableOpacity 
+              onPress={handleGetRecipes}
+              style={{
+                backgroundColor: '#000000',
+                borderRadius: 12,
+                paddingVertical: 12,
+                alignItems: 'center'
+              }}
+            >
+              <Text style={{ color: '#39FF14', fontWeight: '600' }}>Generate Recipes</Text>
+            </TouchableOpacity>
           </View>
         )}
       </ScrollView>
 
       {/* Floating Action Button */}
-      <TouchableOpacity
+      <TouchableOpacity 
         onPress={() => router.push({ pathname: "/add-item" })}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-gradient-to-br from-primary to-primary-container rounded-full flex items-center justify-center shadow-lg shadow-primary/30 z-40"
+        style={{
+          position: 'absolute',
+          bottom: 128,
+          right: 24,
+          backgroundColor: '#39FF14',
+          borderRadius: 999,
+          padding: 16,
+          shadowColor: '#39FF14',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 8
+        }}
       >
-        <Text className="text-3xl font-bold text-on-primary-fixed">+</Text>
+        <Plus color="#000000" size={28} />
       </TouchableOpacity>
-
-      {/* Bottom Navigation */}
-      <View className="fixed bottom-0 w-full z-50 flex-row justify-around items-center px-4 pb-6 pt-3 bg-surface-container/60 backdrop-blur-2xl rounded-t-3xl border-t border-outline-variant/20">
-        {/* Fridge (Active) */}
-        <TouchableOpacity className="flex-col items-center justify-center">
-          <Package size={24} className="text-primary mb-1" />
-          <Text className="text-[10px] uppercase tracking-[0.1em] font-medium text-primary">
-            Fridge
-          </Text>
-        </TouchableOpacity>
-        
-        {/* Recipes */}
-        <TouchableOpacity 
-          onPress={handleGetRecipes}
-          className="flex-col items-center justify-center opacity-60"
-        >
-          <UtensilsCrossed size={24} className="text-on-surface-variant mb-1" />
-          <Text className="text-[10px] uppercase tracking-[0.1em] font-medium text-on-surface-variant">
-            Recipes
-          </Text>
-        </TouchableOpacity>
-        
-        {/* AI Chef */}
-        <TouchableOpacity className="flex-col items-center justify-center opacity-60">
-          <Brain size={24} className="text-on-surface-variant mb-1" />
-          <Text className="text-[10px] uppercase tracking-[0.1em] font-medium text-on-surface-variant">
-            AI Chef
-          </Text>
-        </TouchableOpacity>
-        
-        {/* Settings */}
-        <TouchableOpacity className="flex-col items-center justify-center opacity-60">
-          <Settings size={24} className="text-on-surface-variant mb-1" />
-          <Text className="text-[10px] uppercase tracking-[0.1em] font-medium text-on-surface-variant">
-            Settings
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </SafeAreaView>
   );
 }
