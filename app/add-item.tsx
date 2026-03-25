@@ -130,14 +130,14 @@ export default function AddItemScreen() {
       />
       
       {/* Glass Date Picker Modal */}
-      <GlassDatePicker
+      {/* <GlassDatePicker
         onDateSelect={(date) => {
           setExpiryDate(date);
           setShowDatePicker(false);
         }}
         initialDate={expiryDate}
         minimumDate={new Date()}
-      />
+      /> */}
     </View>
   );
 }

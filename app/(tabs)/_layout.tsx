@@ -24,7 +24,7 @@ export default function TabLayout() {
         options={{
           title: "Fridge",
           tabBarIcon: ({ focused }) => (
-            <Home className={focused ? 'text-[#8eff71]' : 'text-[#888888]'} size={24} />
+            <Home size={24} color={focused ? '#8eff71' : '#888888'} />
           ),
         }}
       />
@@ -33,7 +33,7 @@ export default function TabLayout() {
         options={{
           title: "Cook",
           tabBarIcon: ({ focused }) => (
-            <ChefHat className={focused ? 'text-[#8eff71]' : 'text-[#888888]'} size={24} />
+            <ChefHat size={24} color={focused ? '#8eff71' : '#888888'} />
           ),
         }}
       />
@@ -42,7 +42,7 @@ export default function TabLayout() {
         options={{
           title: "Recipes",
           tabBarIcon: ({ focused }) => (
-            <Utensils className={focused ? 'text-[#8eff71]' : 'text-[#888888]'} size={24} />
+            <Utensils size={24} color={focused ? '#8eff71' : '#888888'} />
           ),
         }}
       />
@@ -51,7 +51,7 @@ export default function TabLayout() {
         options={{
           title: "Add",
           tabBarIcon: ({ focused }) => (
-            <Plus className={focused ? 'text-[#8eff71]' : 'text-[#888888]'} size={24} />
+            <Plus size={24} color={focused ? '#8eff71' : '#888888'} />
           ),
         }}
       />

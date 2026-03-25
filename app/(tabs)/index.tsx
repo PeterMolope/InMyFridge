@@ -1,21 +1,25 @@
+import { identifyFoodFromBase64 } from '@/src/api/geminiApi';
 import { BentoStatsCard } from '@/src/components/BentoStatsCard';
+import CameraComponent from '@/src/components/CameraComponent';
 import { FilterChip } from '@/src/components/FilterChip';
 import { FridgeItemCard } from '@/src/components/FridgeItemCard';
 import { SearchBar } from '@/src/components/SearchBar';
 import { useFridgeStore } from '@/src/context/fridgeStore';
 import { THEME } from '@/src/theme/theme';
-import { Plus } from '@/src/utils/icon-interop';
+import { Camera, Plus } from '@/src/utils/icon-interop';
 import { FlashList } from '@shopify/flash-list';
-import { router } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
-import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Modal, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
 type FilterType = 'all' | 'fresh' | 'expiring' | 'expired';
 
 export default function FridgeScreen() {
-  const { items } = useFridgeStore();
+  const { items, addItem } = useFridgeStore();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCamera, setShowCamera] = useState(false);
+  const [isIdentifying, setIsIdentifying] = useState(false);
 
   // Calculate stats
   const totalItems = items.length;
@@ -59,6 +63,76 @@ export default function FridgeScreen() {
     { key: 'expiring', label: 'Expiring' },
     { key: 'expired', label: 'Expired' },
   ];
+
+  const handlePhotoCapture = async (photoUri: string, base64?: string) => {
+    setShowCamera(false);
+    setIsIdentifying(true);
+    
+    try {
+      if (base64) {
+        // Use base64 data directly from camera
+        const identification = await identifyFoodFromBase64(base64);
+        
+        // Add the identified item to fridge
+        addItem({ 
+          name: identification.itemName,
+          expirationDate: undefined // User can set this later
+        });
+        
+        Alert.alert(
+          "Food Added!", 
+          `Successfully added: ${identification.itemName}`,
+          [{ text: "OK", onPress: () => {} }]
+        );
+      } else {
+        // Fallback: try to get base64 from URI
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          base64: true,
+        });
+
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+          const base64Data = result.assets[0].base64;
+          if (base64Data) {
+            const identification = await identifyFoodFromBase64(base64Data);
+            
+            // Add the identified item to fridge
+            addItem({ 
+              name: identification.itemName,
+              expirationDate: undefined // User can set this later
+            });
+            
+            Alert.alert(
+              "Food Added!", 
+              `Successfully added: ${identification.itemName}`,
+              [{ text: "OK", onPress: () => {} }]
+            );
+          } else {
+            Alert.alert("Error", "Could not process image data");
+          }
+        } else {
+          Alert.alert("Error", "Could not process image data");
+        }
+      }
+    } catch (error) {
+      console.error('Error identifying food:', error);
+      Alert.alert(
+        "Identification Failed", 
+        "Could not identify the food item. Please try again or add manually.",
+        [{ text: "OK", onPress: () => {} }]
+      );
+    } finally {
+      setIsIdentifying(false);
+    }
+  };
+
+  const openCamera = () => {
+    setShowCamera(true);
+  };
+
+  const closeCamera = () => {
+    setShowCamera(false);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: THEME.background }}>
@@ -165,7 +239,8 @@ export default function FridgeScreen() {
 
       {/* Floating Action Button */}
       <TouchableOpacity
-        onPress={() => router.push('/add-item')}
+        onPress={openCamera}
+        disabled={isIdentifying}
         style={{
           position: 'absolute',
           bottom: THEME.spacing.xl,
@@ -183,8 +258,24 @@ export default function FridgeScreen() {
           elevation: 8,
         }}
       >
-        <Plus size={24} color={THEME.background} />
+        {isIdentifying ? (
+          <ActivityIndicator size="small" color={THEME.background} />
+        ) : (
+          <Camera size={24} color={THEME.background} />
+        )}
       </TouchableOpacity>
+
+      {/* Camera Modal */}
+      <Modal
+        visible={showCamera}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <CameraComponent
+          onPhotoCapture={handlePhotoCapture}
+          onClose={closeCamera}
+        />
+      </Modal>
     </SafeAreaView>
   );
 }
