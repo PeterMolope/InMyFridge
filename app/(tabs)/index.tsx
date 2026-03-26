@@ -160,23 +160,25 @@ export default function FridgeScreen() {
       {/* Bento Stats */}
       <View style={{ 
         flexDirection: 'row', 
-        paddingHorizontal: THEME.spacing.md,
-        marginBottom: THEME.spacing.md,
+        paddingHorizontal: THEME.spacing.lg,
+        marginBottom: THEME.spacing.sm,
+        gap: 8,
       }}>
         <BentoStatsCard 
           title="Total Items" 
+          abbreviation="Total"
           value={totalItems} 
-          color="#3B82F6" // Blue
+          color={THEME.accent}
         />
         <BentoStatsCard 
           title="Expiring" 
           value={expiringItems} 
-          color="#FF9F0A" // Orange
+          color={THEME.status.expiring}
         />
         <BentoStatsCard 
           title="Expired" 
           value={expiredItems} 
-          color="#FF453A" // Red
+          color={THEME.status.expired}
         />
       </View>
 

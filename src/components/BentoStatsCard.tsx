@@ -1,55 +1,59 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { THEME } from '../theme/theme';
 
 interface BentoStatsCardProps {
   title: string;
   value: number;
   color: string;
+  abbreviation?: string;
 }
 
-export function BentoStatsCard({ title, value, color }: BentoStatsCardProps) {
+export function BentoStatsCard({ title, value, color, abbreviation }: BentoStatsCardProps) {
+  const displayTitle = abbreviation || title;
   return (
     <View 
       style={{
         backgroundColor: THEME.surface,
-        borderRadius: THEME.radius.card,
-        padding: THEME.spacing.lg,
+        borderRadius: 12,
+        padding: THEME.spacing.sm,
         flex: 1,
-        marginHorizontal: THEME.spacing.xs,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
+        marginHorizontal: 4,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.05)',
+        minHeight: 60,
       }}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: THEME.spacing.sm }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
         <View 
           style={{
-            width: 8,
-            height: 8,
-            borderRadius: 4,
+            width: 6,
+            height: 6,
+            borderRadius: 3,
             backgroundColor: color,
-            marginRight: THEME.spacing.sm,
+            marginRight: 6,
           }}
         />
         <Text 
           style={{
-            color: THEME.text.secondary,
-            fontSize: 14,
+            color: '#888888',
+            fontSize: 10,
             fontFamily: 'SpaceMono',
+            textTransform: 'uppercase',
+            letterSpacing: 0.5,
           }}
         >
-          {title}
+          {displayTitle}
         </Text>
       </View>
       <Text 
         style={{
           color: THEME.text.primary,
-          fontSize: 28,
+          fontSize: 20,
           fontWeight: 'bold',
           fontFamily: 'SpaceMono',
+          textAlign: 'center',
+          flex: 1,
         }}
       >
         {value}
