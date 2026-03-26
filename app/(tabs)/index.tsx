@@ -15,11 +15,16 @@ import { ActivityIndicator, Alert, Modal, SafeAreaView, Text, TouchableOpacity, 
 type FilterType = 'all' | 'fresh' | 'expiring' | 'expired';
 
 export default function FridgeScreen() {
-  const { items, addItem, removeItem } = useFridgeStore();
+  const { items, addItem, removeItem, initializeItems } = useFridgeStore();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showCamera, setShowCamera] = useState(false);
   const [isIdentifying, setIsIdentifying] = useState(false);
+
+  // Initialize existing items with proper images
+  React.useEffect(() => {
+    initializeItems();
+  }, [initializeItems]);
 
   // Calculate stats
   const totalItems = items.length;
@@ -74,7 +79,7 @@ export default function FridgeScreen() {
         const identification = await identifyFoodFromBase64(base64);
         
         // Add the identified item to fridge
-        addItem({ 
+        await addItem({ 
           name: identification.itemName,
           expirationDate: undefined // User can set this later
         });
@@ -97,7 +102,7 @@ export default function FridgeScreen() {
             const identification = await identifyFoodFromBase64(base64Data);
             
             // Add the identified item to fridge
-            addItem({ 
+            await addItem({ 
               name: identification.itemName,
               expirationDate: undefined // User can set this later
             });

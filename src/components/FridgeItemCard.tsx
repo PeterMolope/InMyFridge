@@ -62,13 +62,23 @@ export function FridgeItemCard({ item, onAddPress, onDeletePress }: FridgeItemCa
         }}
       >
         <Image
-          source={{ uri: item.image || 'https://via.placeholder.com/60x60' }}
+          source={item.image 
+            ? { uri: item.image } 
+            : { uri: 'https://madeinindiarestaurant.com/img/placeholders/comfort_food_placeholder.png?v=1' }
+          }
           style={{
             width: 50,
             height: 50,
             borderRadius: 25,
           }}
           resizeMode="cover"
+          onError={(error) => {
+            console.log('Image load error:', error);
+            console.log('Image URI:', item.image);
+          }}
+          onLoad={() => {
+            console.log(`Loaded image for ${item.name}:`, item.image);
+          }}
         />
       </View>
 
