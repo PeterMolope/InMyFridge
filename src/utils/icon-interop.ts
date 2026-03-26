@@ -1,4 +1,4 @@
-import { AlertCircle, Apple, Bell, Bookmark, Calendar, Camera, Check, ChefHat, Clock, Coffee, Filter, Heart, Home, Package, Pizza, Plus, Salad, Search, Settings, Share2, ShoppingCart, Sparkles, Star, TrendingUp, User, Utensils, X, Zap } from 'lucide-react-native';
+import { AlertCircle, Apple, Bell, Bookmark, Calendar, Camera, Check, ChefHat, Clock, Coffee, Filter, Heart, Home, Package, Pizza, Plus, Salad, Search, Settings, Share2, ShoppingCart, Sparkles, Star, Trash2, TrendingUp, User, Utensils, X, Zap } from 'lucide-react-native';
 import { cssInterop } from 'nativewind';
 
 // Icon CSS interop for nativewind compatibility
@@ -34,8 +34,9 @@ cssInterop(Apple, { className: true });
 cssInterop(Coffee, { className: true });
 cssInterop(Pizza, { className: true });
 cssInterop(Salad, { className: true });
+cssInterop(Trash2, { className: true });
 
 export {
-    AlertCircle, Apple, Bell, Bookmark, Calendar, Camera, Check, ChefHat, Clock, Coffee, Filter, Heart, Home, Package, Pizza, Plus, Salad, Search, Settings, Share2, ShoppingCart, Sparkles, Star, TrendingUp, User, Utensils, X, Zap
+    AlertCircle, Apple, Bell, Bookmark, Calendar, Camera, Check, ChefHat, Clock, Coffee, Filter, Heart, Home, Package, Pizza, Plus, Salad, Search, Settings, Share2, ShoppingCart, Sparkles, Star, Trash2, TrendingUp, User, Utensils, X, Zap
 };
 

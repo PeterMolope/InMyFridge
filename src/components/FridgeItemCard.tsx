@@ -1,15 +1,16 @@
-import { Plus } from '@/src/utils/icon-interop';
+import { Plus, Trash2 } from '@/src/utils/icon-interop';
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
 import { FoodItem } from '../context/fridgeStore';
 import { THEME } from '../theme/theme';
 
 interface FridgeItemCardProps {
   item: FoodItem;
   onAddPress?: () => void;
+  onDeletePress?: (id: string) => void;
 }
 
-export function FridgeItemCard({ item, onAddPress }: FridgeItemCardProps) {
+export function FridgeItemCard({ item, onAddPress, onDeletePress }: FridgeItemCardProps) {
   const getDaysRemaining = () => {
     const today = new Date();
     const expiryDate = new Date(item.expirationDate || Date.now());
@@ -38,8 +39,8 @@ export function FridgeItemCard({ item, onAddPress }: FridgeItemCardProps) {
         backgroundColor: THEME.surface,
         borderRadius: THEME.radius.card,
         marginHorizontal: THEME.spacing.md,
-        marginVertical: THEME.spacing.sm,
-        padding: THEME.spacing.lg,
+        marginVertical: THEME.spacing.xs,
+        padding: THEME.spacing.md,
         flexDirection: 'row',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -51,114 +52,174 @@ export function FridgeItemCard({ item, onAddPress }: FridgeItemCardProps) {
       {/* Item Image */}
       <View 
         style={{
-          width: 80,
-          height: 80,
-          borderRadius: THEME.radius.card / 2,
+          width: 60,
+          height: 60,
+          borderRadius: 30,
           backgroundColor: THEME.border.subtle,
-          marginRight: THEME.spacing.lg,
+          marginRight: THEME.spacing.md,
           justifyContent: 'center',
           alignItems: 'center',
         }}
       >
         <Image
-          source={{ uri: item.image || 'https://via.placeholder.com/80x80' }}
+          source={{ uri: item.image || 'https://via.placeholder.com/60x60' }}
           style={{
-            width: 70,
-            height: 70,
-            borderRadius: THEME.radius.card / 2,
+            width: 50,
+            height: 50,
+            borderRadius: 25,
           }}
           resizeMode="cover"
         />
       </View>
 
       {/* Item Details */}
-      <View style={{ flex: 1 }}>
-        <Text 
-          style={{
-            color: THEME.text.primary,
-            fontSize: 18,
-            fontWeight: 'bold',
-            fontFamily: 'SpaceMono',
-            marginBottom: THEME.spacing.xs,
-          }}
-        >
-          {item.name}
-        </Text>
+      <View style={{ flex: 1, justifyContent: 'space-between' }}>
+        <View>
+          <Text 
+            style={{
+              color: THEME.text.primary,
+              fontSize: 16,
+              fontWeight: 'bold',
+              fontFamily: 'SpaceMono',
+              marginBottom: 2,
+            }}
+          >
+            {item.name}
+          </Text>
+          
+          <Text 
+            style={{
+              color: THEME.text.secondary,
+              fontSize: 12,
+              fontFamily: 'SpaceMono',
+              marginBottom: 4,
+            }}
+          >
+            {item.category}
+          </Text>
+        </View>
         
-        <Text 
-          style={{
-            color: THEME.text.secondary,
-            fontSize: 14,
-            fontFamily: 'SpaceMono',
-            marginBottom: THEME.spacing.xs,
-          }}
-        >
-          {item.quantity} - {item.category}
-        </Text>
-
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: THEME.spacing.sm }}>
+        {/* Bottom Row: Quantity, Expiry, Status */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          {/* Quantity Display */}
+          <View style={{
+            backgroundColor: THEME.accent,
+            borderRadius: 8,
+            paddingHorizontal: 8,
+            paddingVertical: 2,
+          }}>
+            <Text 
+              style={{
+                color: THEME.background,
+                fontSize: 11,
+                fontWeight: 'bold',
+                fontFamily: 'SpaceMono',
+              }}
+            >
+              Qty: {item.quantity || 1}
+            </Text>
+          </View>
+          
+          {/* Expiry Info */}
           <Text 
             style={{
               color: THEME.text.tertiary,
-              fontSize: 12,
+              fontSize: 10,
               fontFamily: 'SpaceMono',
-              marginRight: THEME.spacing.sm,
+              flex: 1,
+              textAlign: 'center',
             }}
           >
             {daysRemaining < 0 
-              ? `Expired ${Math.abs(daysRemaining)} days ago`
-              : `Expires in ${daysRemaining} days`
+              ? `Expired ${Math.abs(daysRemaining)}d ago`
+              : `Expires in ${daysRemaining}d`
             }
           </Text>
-        </View>
-
-        {/* Status Badge */}
-        <View 
-          style={{
-            backgroundColor: status.color,
-            borderRadius: THEME.radius.button / 2,
-            paddingHorizontal: THEME.spacing.sm,
-            paddingVertical: THEME.spacing.xs,
-            alignSelf: 'flex-start',
-          }}
-        >
-          <Text 
+          
+          {/* Status Badge */}
+          <View 
             style={{
-              color: '#FFFFFF',
-              fontSize: 12,
-              fontWeight: 'bold',
-              fontFamily: 'SpaceMono',
+              backgroundColor: status.color,
+              borderRadius: 8,
+              paddingHorizontal: 8,
+              paddingVertical: 2,
             }}
           >
-            {status.label}
-          </Text>
+            <Text 
+              style={{
+                color: '#FFFFFF',
+                fontSize: 10,
+                fontWeight: 'bold',
+                fontFamily: 'SpaceMono',
+              }}
+            >
+              {status.label}
+            </Text>
+          </View>
         </View>
       </View>
 
-      {/* Add Button */}
-      {onAddPress && (
-        <TouchableOpacity
-          onPress={onAddPress}
-          style={{
-            backgroundColor: THEME.accent,
-            width: 32,
-            height: 32,
-            borderRadius: 16,
-            justifyContent: 'center',
-            alignItems: 'center',
-            position: 'absolute',
-            bottom: THEME.spacing.lg,
-            right: THEME.spacing.lg,
-            shadowColor: THEME.accent,
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.3,
-            shadowRadius: 4,
-            elevation: 4,
-          }}
-        >
-          <Plus size={16} color={THEME.background} />
-        </TouchableOpacity>
-      )}
+      {/* Action Buttons */}
+      <View style={{
+        position: 'absolute',
+        top: THEME.spacing.md,
+        right: THEME.spacing.md,
+        flexDirection: 'row',
+        gap: THEME.spacing.sm,
+      }}>
+        {/* Delete Button */}
+        {onDeletePress && (
+          <TouchableOpacity
+            onPress={() => {
+              Alert.alert(
+                'Delete Item',
+                `Are you sure you want to delete ${item.name}?`,
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  { text: 'Delete', style: 'destructive', onPress: () => onDeletePress(item.id) },
+                ]
+              );
+            }}
+            style={{
+              backgroundColor: THEME.status.expired,
+              width: 32,
+              height: 32,
+              borderRadius: 16,
+              justifyContent: 'center',
+              alignItems: 'center',
+              shadowColor: THEME.status.expired,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
+              elevation: 4,
+            }}
+          >
+            <Trash2 size={16} color={THEME.background} />
+          </TouchableOpacity>
+        )}
+        
+        {/* Add Button */}
+        {onAddPress && (
+          <TouchableOpacity
+            onPress={onAddPress}
+            style={{
+              backgroundColor: THEME.accent,
+              width: 32,
+              height: 32,
+              borderRadius: 16,
+              justifyContent: 'center',
+              alignItems: 'center',
+              shadowColor: THEME.accent,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
+              elevation: 4,
+            }}
+          >
+            <Plus size={16} color={THEME.background} />
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 }

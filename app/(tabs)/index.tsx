@@ -15,7 +15,7 @@ import { ActivityIndicator, Alert, Modal, SafeAreaView, Text, TouchableOpacity, 
 type FilterType = 'all' | 'fresh' | 'expiring' | 'expired';
 
 export default function FridgeScreen() {
-  const { items, addItem } = useFridgeStore();
+  const { items, addItem, removeItem } = useFridgeStore();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showCamera, setShowCamera] = useState(false);
@@ -216,6 +216,9 @@ export default function FridgeScreen() {
             onAddPress={() => {
               // Handle add to shopping list or other action
               console.log('Add item:', item.name);
+            }}
+            onDeletePress={(id) => {
+              removeItem(id);
             }}
           />
         )}
