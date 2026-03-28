@@ -1,6 +1,6 @@
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Calendar } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import IngredientAutocomplete from "../src/components/IngredientAutocomplete";
 import QuantityExpiryModal from "../src/components/QuantityExpiryModal";
@@ -13,11 +13,30 @@ interface Ingredient {
 }
 
 export default function AddItemScreen() {
+  const params = useLocalSearchParams();
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [expiryDate, setExpiryDate] = useState<Date | undefined>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const { addItem } = useFridgeStore();
+
+  // Handle camera params
+  useEffect(() => {
+    if (params.name) {
+      // Pre-fill with camera recognition data
+      setSelectedIngredient({
+        id: Date.now(),
+        name: params.name as string,
+        image: params.imageUri as string,
+      });
+      
+      // Show confidence info if available
+      if (params.confidence) {
+        const confidence = parseFloat(params.confidence as string);
+        console.log(`AI Recognition confidence: ${(confidence * 100).toFixed(1)}%`);
+      }
+    }
+  }, [params]);
 
   const handleIngredientSelect = (ingredient: Ingredient) => {
     setSelectedIngredient(ingredient);
