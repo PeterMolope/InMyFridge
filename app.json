@@ -33,8 +33,9 @@
         "android.permission.WRITE_EXTERNAL_STORAGE"
       ],
       "navigationBar": {
-        "visible": "transparent",
-        "barStyle": "light-content"
+        "visible": "sticky",
+        "barStyle": "light-content",
+        "backgroundColor": "#121212"
       },
       "statusBar": {
         "backgroundColor": "#050505",

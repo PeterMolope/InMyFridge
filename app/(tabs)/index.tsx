@@ -10,7 +10,7 @@ import { Camera, Plus } from '@/src/utils/icon-interop';
 import { FlashList } from '@shopify/flash-list';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Modal, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Modal, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 type FilterType = 'all' | 'fresh' | 'expiring' | 'expired';
 
@@ -197,18 +197,26 @@ export default function FridgeScreen() {
 
       {/* Filter Chips */}
       <View style={{ 
-        flexDirection: 'row', 
         paddingHorizontal: THEME.spacing.lg,
         marginBottom: THEME.spacing.md,
       }}>
-        {filters.map(filter => (
-          <FilterChip
-            key={filter.key}
-            label={filter.label}
-            isActive={activeFilter === filter.key}
-            onPress={() => setActiveFilter(filter.key)}
-          />
-        ))}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            flexDirection: 'row',
+            gap: THEME.spacing.sm,
+          }}
+        >
+          {filters.map(filter => (
+            <FilterChip
+              key={filter.key}
+              label={filter.label}
+              isActive={activeFilter === filter.key}
+              onPress={() => setActiveFilter(filter.key)}
+            />
+          ))}
+        </ScrollView>
       </View>
 
       {/* Items List */}
@@ -220,7 +228,6 @@ export default function FridgeScreen() {
             item={item}
             onAddPress={() => {
               // Handle add to shopping list or other action
-              console.log('Add item:', item.name);
             }}
             onDeletePress={(id) => {
               removeItem(id);

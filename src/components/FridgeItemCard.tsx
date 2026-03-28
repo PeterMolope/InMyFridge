@@ -73,11 +73,10 @@ export function FridgeItemCard({ item, onAddPress, onDeletePress }: FridgeItemCa
           }}
           resizeMode="cover"
           onError={(error) => {
-            console.log('Image load error:', error);
-            console.log('Image URI:', item.image);
+            // Silent error handling
           }}
           onLoad={() => {
-            console.log(`Loaded image for ${item.name}:`, item.image);
+            // Silent load handling
           }}
         />
       </View>

@@ -10,7 +10,6 @@ export const getCleanFoodImage = (foodName: string): string => {
   // 2. Return the Spoonacular CDN link
   // 250x250 is a perfect size for fridge item cards
   const imageUrl = `https://spoonacular.com/cdn/ingredients_250x250/${formattedName}.jpg`;
-  console.log('Generated image URL:', imageUrl, 'for food:', foodName);
   return imageUrl;
 };
 
