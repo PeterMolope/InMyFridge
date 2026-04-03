@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#050505"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true,
@@ -38,7 +38,7 @@
         "backgroundColor": "#121212"
       },
       "statusBar": {
-        "backgroundColor": "#050505",
+        "backgroundColor": "#000000",
         "barStyle": "light-content",
         "translucent": false
       }
