@@ -1,6 +1,6 @@
 import {
-    DarkTheme,
-    ThemeProvider,
+  DarkTheme,
+  ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -18,8 +18,8 @@ import { THEME } from "../src/theme/theme";
 import { SystemUIManager } from "../src/utils/SystemUIManager";
 
 export {
-    // Catch any errors thrown by the Layout component.
-    ErrorBoundary
+  // Catch any errors thrown by the Layout component.
+  ErrorBoundary
 } from "expo-router";
 
 export const unstable_settings = {
