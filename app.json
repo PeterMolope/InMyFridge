@@ -54,6 +54,9 @@
 
     "runtimeVersion": {
       "policy": "sdkVersion"
+    },
+    "extra": {
+      "nvidiaApiKey": "${NVIDIA_FLUX_API_KEY}"
     }
   }
 }

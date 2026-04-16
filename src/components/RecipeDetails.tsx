@@ -1,9 +1,8 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
-import { Clock, Users, ChefHat, ArrowLeft, AlertCircle, Heart, Bookmark } from 'lucide-react-native';
+import { AlertCircle, ArrowLeft, Bookmark, ChefHat, Clock, Heart, Users } from 'lucide-react-native';
+import React from 'react';
+import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { fetchRecipeDetails } from '../api/recipeApi';
-import { Recipe } from '../api/recipeApi';
 
 interface RecipeDetailsProps {
   recipeId: number;
@@ -125,7 +124,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({ recipeId, onBack }) => {
         <Image
           source={{ uri: recipe.image }}
           style={{ width: '100%', height: 250 }}
-          contentFit="cover"
+          resizeMode="cover"
         />
         
         {/* Back Button */}

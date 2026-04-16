@@ -1,6 +1,7 @@
 import { identifyFoodFromBase64 } from "@/src/api/geminiApi";
 import CameraComponent from "@/src/components/CameraComponent";
 import { useFridgeStore } from "@/src/context/fridgeStore";
+import { generateFridgeAsset } from "@/src/services/imageGenerator";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from "expo-router";
@@ -21,17 +22,46 @@ export default function AddItemScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [isIdentifying, setIsIdentifying] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const { addItem } = useFridgeStore();
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!name.trim()) {
       Alert.alert("Error", "Please enter an item name");
       return;
     }
-    addItem({ name: name.trim(), expirationDate });
-    setName("");
-    setExpirationDate(undefined);
-    router.back();
+
+    setIsGeneratingImage(true);
+    
+    try {
+      // Generate image for the food item
+      const imageResult = await generateFridgeAsset(name.trim());
+      
+      // Add item with generated image
+      addItem({ 
+        name: name.trim(), 
+        expirationDate,
+        image: imageResult.imageUrl
+      });
+      
+      // If there was an error with image generation, show a subtle notification
+      if (imageResult.error) {
+        console.log('Image generation used fallback:', imageResult.error);
+      }
+      
+      setName("");
+      setExpirationDate(undefined);
+      router.back();
+    } catch (error) {
+      console.error('Error adding item:', error);
+      Alert.alert(
+        "Error", 
+        "Failed to add item. Please try again.",
+        [{ text: "OK", onPress: () => {} }]
+      );
+    } finally {
+      setIsGeneratingImage(false);
+    }
   };
 
   const handlePhotoCapture = async (photoUri: string, base64?: string) => {
@@ -145,8 +175,16 @@ export default function AddItemScreen() {
       <TouchableOpacity
         onPress={handleAdd}
         className="bg-primary p-4 rounded-lg"
+        disabled={isGeneratingImage}
       >
-        <Text className="text-white text-center font-bold">Add Item</Text>
+        {isGeneratingImage ? (
+          <View className="flex-row justify-center items-center">
+            <ActivityIndicator color="white" size="small" />
+            <Text className="text-white text-center font-bold ml-2">Generating Image...</Text>
+          </View>
+        ) : (
+          <Text className="text-white text-center font-bold">Add Item</Text>
+        )}
       </TouchableOpacity>
 
       <Modal
