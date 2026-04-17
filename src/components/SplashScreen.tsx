@@ -74,7 +74,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           }).start(() => {
             onComplete();
           });
-        }, 10000);
+        }, 5000);
 
       } catch (error) {
         console.error('Initialization failed', error);
