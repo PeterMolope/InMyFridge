@@ -9,7 +9,8 @@ export const getCleanFoodImage = (foodName: string): string => {
   
   // 2. Return the Spoonacular CDN link
   // 250x250 is a perfect size for fridge item cards
-  const imageUrl = `https://spoonacular.com/cdn/ingredients_250x250/${formattedName}.jpg`;
+  const spoonacularCdnUrl = process.env.EXPO_PUBLIC_SPOONACULAR_CDN_URL || "https://spoonacular.com/cdn/ingredients_250x250";
+  const imageUrl = `${spoonacularCdnUrl}/${formattedName}.jpg`;
   return imageUrl;
 };
 
@@ -17,7 +18,8 @@ export const getCleanFoodImage = (foodName: string): string => {
  * Fallback image for items that might not exist in Spoonacular database
  * or for any loading errors
  */
-export const FALLBACK_IMAGE = 'https://spoonacular.com/cdn/ingredients_250x250/unknown.jpg';
+const spoonacularCdnUrl = process.env.EXPO_PUBLIC_SPOONACULAR_CDN_URL || "https://spoonacular.com/cdn/ingredients_250x250";
+export const FALLBACK_IMAGE = `${spoonacularCdnUrl}/unknown.jpg`;
 
 /**
  * Enhanced image function with fallback support

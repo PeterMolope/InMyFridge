@@ -6,13 +6,13 @@ import * as ImagePicker from 'expo-image-picker';
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Modal,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    Alert,
+    Modal,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from "react-native";
 
 export default function AddItemScreen() {
@@ -21,19 +21,30 @@ export default function AddItemScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [isIdentifying, setIsIdentifying] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const { addItem } = useFridgeStore();
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!name.trim()) {
       Alert.alert("Error", "Please enter an item name");
       return;
     }
-    addItem({ name: name.trim(), expirationDate });
-    setName("");
-    setExpirationDate(undefined);
-    router.back();
+
+    setIsGeneratingImage(true);
+    
+    try {
+      await addItem({ name: name.trim(), expirationDate });
+      setName("");
+      setExpirationDate(undefined);
+      router.back();
+    } catch (error) {
+      Alert.alert("Error", "Failed to generate image. Please try again.");
+    } finally {
+      setIsGeneratingImage(false);
+    }
   };
 
+  
   const handlePhotoCapture = async (photoUri: string, base64?: string) => {
     setShowCamera(false);
     setIsIdentifying(true);
@@ -144,9 +155,17 @@ export default function AddItemScreen() {
       </TouchableOpacity>
       <TouchableOpacity
         onPress={handleAdd}
+        disabled={!name.trim() || isGeneratingImage}
         className="bg-primary p-4 rounded-lg"
       >
-        <Text className="text-white text-center font-bold">Add Item</Text>
+        {isGeneratingImage ? (
+          <View className="flex-row items-center justify-center">
+            <ActivityIndicator size="small" color="#fff" />
+            <Text className="text-white text-center font-bold ml-2">Generating Image...</Text>
+          </View>
+        ) : (
+          <Text className="text-white text-center font-bold">Add Item</Text>
+        )}
       </TouchableOpacity>
 
       <Modal

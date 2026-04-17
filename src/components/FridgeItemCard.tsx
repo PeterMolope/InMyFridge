@@ -1,16 +1,19 @@
-import { Plus, Trash2 } from '@/src/utils/icon-interop';
-import React from 'react';
+import { Check, Trash2 } from '@/src/utils/icon-interop';
+import React, { useState } from 'react';
 import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
 import { FoodItem } from '../context/fridgeStore';
 import { THEME } from '../theme/theme';
 
 interface FridgeItemCardProps {
   item: FoodItem;
-  onAddPress?: () => void;
   onDeletePress?: (id: string) => void;
+  onSelectChange?: (id: string, selected: boolean) => void;
+  selected?: boolean;
 }
 
-export function FridgeItemCard({ item, onAddPress, onDeletePress }: FridgeItemCardProps) {
+export function FridgeItemCard({ item, onDeletePress, onSelectChange, selected = false }: FridgeItemCardProps) {
+  const [isSelected, setIsSelected] = useState(selected);
+
   const getDaysRemaining = () => {
     const today = new Date();
     const expiryDate = new Date(item.expirationDate || Date.now());
@@ -33,6 +36,14 @@ export function FridgeItemCard({ item, onAddPress, onDeletePress }: FridgeItemCa
   const status = getStatus();
   const daysRemaining = getDaysRemaining();
 
+  const toggleSelection = () => {
+    const newSelected = !isSelected;
+    setIsSelected(newSelected);
+    if (onSelectChange) {
+      onSelectChange(item.id, newSelected);
+    }
+  };
+
   return (
     <View 
       style={{
@@ -49,6 +60,24 @@ export function FridgeItemCard({ item, onAddPress, onDeletePress }: FridgeItemCa
         elevation: 3,
       }}
     >
+      {/* Selection Checkbox */}
+      <TouchableOpacity
+        onPress={toggleSelection}
+        style={{
+          width: 24,
+          height: 24,
+          borderRadius: 12,
+          borderWidth: 2,
+          borderColor: isSelected ? THEME.accent : THEME.border.subtle,
+          backgroundColor: isSelected ? THEME.accent : 'transparent',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginRight: THEME.spacing.md,
+        }}
+      >
+        {isSelected && <Check size={14} color={THEME.background} />}
+      </TouchableOpacity>
+
       {/* Item Image */}
       <View 
         style={{
@@ -207,27 +236,6 @@ export function FridgeItemCard({ item, onAddPress, onDeletePress }: FridgeItemCa
           </TouchableOpacity>
         )}
         
-        {/* Add Button */}
-        {onAddPress && (
-          <TouchableOpacity
-            onPress={onAddPress}
-            style={{
-              backgroundColor: THEME.accent,
-              width: 32,
-              height: 32,
-              borderRadius: 16,
-              justifyContent: 'center',
-              alignItems: 'center',
-              shadowColor: THEME.accent,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.3,
-              shadowRadius: 4,
-              elevation: 4,
-            }}
-          >
-            <Plus size={16} color={THEME.background} />
-          </TouchableOpacity>
-        )}
       </View>
     </View>
   );

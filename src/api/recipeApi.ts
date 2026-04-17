@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const SPOONACULAR_API_KEY = process.env.EXPO_PUBLIC_SPOONACULAR_API_KEY || "";
-const BASE_URL = "https://api.spoonacular.com";
+const BASE_URL = process.env.EXPO_PUBLIC_SPOONACULAR_API_URL || "https://api.spoonacular.com";
 
 export interface Recipe {
   id: number;

@@ -20,7 +20,8 @@ export const findNicheFoodImage = async (itemName: string) => {
   // We append keywords to "force" high-quality, isolated product shots
   const refinedQuery = `${itemName} food product isolated white background png`;
   
-  const url = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(refinedQuery)}&searchType=image&key=${GOOGLE_API_KEY}&cx=${CX}&num=1&imgSize=medium&imgType=stock`;
+  const googleApiUrl = process.env.EXPO_PUBLIC_GOOGLE_API_URL || "https://www.googleapis.com/customsearch/v1";
+  const url = `${googleApiUrl}?q=${encodeURIComponent(refinedQuery)}&searchType=image&key=${GOOGLE_API_KEY}&cx=${CX}&num=1&imgSize=medium&imgType=stock`;
 
   try {
     const response = await fetch(url);

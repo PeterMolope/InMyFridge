@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { getBestFoodImage } from "../services/imageSearch";
+import { generateFridgeAsset } from "../services/imageGenerator";
 
 export interface FoodItem {
   id: string;
@@ -32,16 +32,21 @@ export const useFridgeStore = create<FridgeState>()(
       addItem: async (item) => {
         console.log('Store addItem called with:', item);
         
-        // 1. Fetch the image FIRST before adding to state
-        const tempImage = await getBestFoodImage(item.name);
-        console.log('Final image in store:', tempImage);
+        // 1. Generate the image FIRST before adding to state
+        const imageResult = await generateFridgeAsset(item.name);
+                
+        // 2. Check if image generation was successful
+        if (imageResult.error) {
+          console.error('Image generation failed:', imageResult.error);
+          throw new Error(`Image generation failed: ${imageResult.error}`);
+        }
         
-        // 2. ONLY THEN add it to the state with the real URL
+        // 3. ONLY THEN add it to the state with the generated image URL
         set((state) => ({
           items: [...state.items, { 
             ...item, 
             id: Date.now().toString(),
-            image: tempImage
+            image: imageResult.imageUrl
           }],
         }));
       },
@@ -81,18 +86,24 @@ export const useFridgeStore = create<FridgeState>()(
         
         // Update each item individually to avoid race conditions
         for (const item of itemsToUpdate) {
-          console.log('Fetching image for existing item:', item.name);
-          const freshImage = await getBestFoodImage(item.name);
+          console.log('Generating image for existing item:', item.name);
+          const imageResult = await generateFridgeAsset(item.name);
+          
+          if (imageResult.error) {
+            console.error('Failed to generate image for', item.name, ':', imageResult.error);
+            // Continue with next item instead of failing completely
+            continue;
+          }
           
           set((state) => ({
             items: state.items.map(existingItem =>
               existingItem.id === item.id 
-                ? { ...existingItem, image: freshImage }
+                ? { ...existingItem, image: imageResult.imageUrl }
                 : existingItem
             ),
           }));
           
-          console.log('Updated image for', item.name, ':', freshImage);
+          console.log('Updated image for', item.name, ':', imageResult.imageUrl);
         }
       },
     }),
