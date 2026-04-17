@@ -1,88 +1,211 @@
-import { DarkModeToggle } from "@/src/components/DarkModeToggle";
-import FoodItemCard from "@/src/components/FoodItemCard";
-import { FoodItem, useFridgeStore } from "@/src/context/fridgeStore";
-import { router } from "expo-router";
-import { ChefHat, Circle, Plus, Square } from "lucide-react-native";
-import React from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { BentoStatsCard } from '@/src/components/BentoStatsCard';
+import { FilterChip } from '@/src/components/FilterChip';
+import { FridgeItemCard } from '@/src/components/FridgeItemCard';
+import { SearchBar } from '@/src/components/SearchBar';
+import { useFridgeStore } from '@/src/context/fridgeStore';
+import { THEME } from '@/src/theme/theme';
+import { Camera, Plus } from '@/src/utils/icon-interop';
+import { FlashList } from '@shopify/flash-list';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+
+type FilterType = 'all' | 'fresh' | 'expiring' | 'expired';
 
 export default function FridgeScreen() {
-  const { items, removeItem, selectedItems, toggleSelectItem } = useFridgeStore();
+  const { items, addItem, removeItem, initializeItems } = useFridgeStore();
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleEat = (id: string) => {
-    // In a real app, you might want to track eaten items or show a confirmation
-    console.log(`Item ${id} marked as eaten`);
-    removeItem(id);
-  };
+  // Initialize existing items with proper images
+  React.useEffect(() => {
+    initializeItems();
+  }, [initializeItems]);
 
-  const renderItem = ({ item }: { item: FoodItem }) => (
-    <FoodItemCard
-      item={item}
-      isSelected={selectedItems.includes(item.id)}
-      onSelect={toggleSelectItem}
-      onRemove={removeItem}
-      onEat={handleEat}
-    />
-  );
+  // Calculate stats
+  const totalItems = items.length;
+  const expiringItems = items.filter(item => {
+    if (!item.expirationDate) return false;
+    const daysRemaining = Math.ceil((new Date(item.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+    return daysRemaining > 0 && daysRemaining <= 3;
+  }).length;
+  const expiredItems = items.filter(item => {
+    if (!item.expirationDate) return false;
+    const daysRemaining = Math.ceil((new Date(item.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+    return daysRemaining < 0;
+  }).length;
 
-  const handleGetRecipes = () => {
-    if (selectedItems.length === 0) {
-      alert("Please select some ingredients first");
-      return;
+  // Filter items based on selected filter and search
+  const filteredItems = items.filter(item => {
+    // Search filter
+    if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
     }
-    router.push({ pathname: "/(tabs)/recipes" });
+
+    // Status filter
+    if (!item.expirationDate) return false;
+    const daysRemaining = Math.ceil((new Date(item.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+    
+    switch (activeFilter) {
+      case 'fresh':
+        return daysRemaining > 3;
+      case 'expiring':
+        return daysRemaining > 0 && daysRemaining <= 3;
+      case 'expired':
+        return daysRemaining < 0;
+      default:
+        return true;
+    }
+  });
+
+  const filters: { key: FilterType; label: string }[] = [
+    { key: 'all', label: 'All' },
+    { key: 'fresh', label: 'Fresh' },
+    { key: 'expiring', label: 'Expiring' },
+    { key: 'expired', label: 'Expired' },
+  ];
+
+  const openCamera = () => {
+    router.push('/camera' as any);
   };
 
   return (
-    <View className="flex-1 bg-background p-4">
-      <View className="flex-row justify-between items-center mb-4">
-        <Text className="text-text text-2xl font-bold">My Fridge</Text>
-        <DarkModeToggle />
+    <SafeAreaView style={{ flex: 1, backgroundColor: THEME.background }}>
+      {/* Header */}
+      <View style={{ 
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        paddingHorizontal: THEME.spacing.lg,
+        paddingVertical: THEME.spacing.md,
+      }}>
+        <Text style={{
+          color: THEME.text.primary,
+          fontSize: 24,
+          fontWeight: 'bold',
+          fontFamily: 'SpaceMono',
+        }}>
+          Welcome back, My Fridge
+        </Text>
+        <TouchableOpacity>
+          <Plus size={24} color={THEME.text.secondary} />
+        </TouchableOpacity>
       </View>
-      <FlatList
-        data={items}
+
+      {/* Bento Stats */}
+      <View style={{ 
+        flexDirection: 'row', 
+        paddingHorizontal: THEME.spacing.lg,
+        marginBottom: THEME.spacing.sm,
+        gap: 8,
+      }}>
+        <BentoStatsCard 
+          title="Total Items" 
+          abbreviation="Total"
+          value={totalItems} 
+          color={THEME.accent}
+        />
+        <BentoStatsCard 
+          title="Expiring" 
+          value={expiringItems} 
+          color={THEME.status.expiring}
+        />
+        <BentoStatsCard 
+          title="Expired" 
+          value={expiredItems} 
+          color={THEME.status.expired}
+        />
+      </View>
+
+      {/* Search Bar */}
+      <SearchBar
+        placeholder="Search items..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        onFilterPress={() => {}}
+      />
+
+      {/* Filter Chips */}
+      <View style={{ 
+        paddingHorizontal: THEME.spacing.lg,
+        marginBottom: THEME.spacing.md,
+      }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            flexDirection: 'row',
+            gap: THEME.spacing.sm,
+          }}
+        >
+          {filters.map(filter => (
+            <FilterChip
+              key={filter.key}
+              label={filter.label}
+              isActive={activeFilter === filter.key}
+              onPress={() => setActiveFilter(filter.key)}
+            />
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Items List */}
+      <FlashList
+        data={filteredItems}
         keyExtractor={(item) => item.id}
-        renderItem={renderItem}
+        renderItem={({ item }) => (
+          <FridgeItemCard
+            item={item}
+            onAddPress={() => {
+              // Handle add to shopping list or other action
+            }}
+            onDeletePress={(id) => {
+              removeItem(id);
+            }}
+          />
+        )}
+        contentContainerStyle={{ paddingBottom: THEME.spacing.xxl }}
         ListEmptyComponent={
-          <View className="flex-1 items-center justify-center py-20">
-            <View className="relative mb-8">
-              <Square size={120} color="#9CA3AF" />
-              <Circle 
-                size={40} 
-                color="#E5E7EB" 
-                style={{ position: 'absolute', top: -10, right: -10 }}
-              />
-            </View>
-            <Text className="text-text text-2xl font-bold mb-2 text-center">
-              Your fridge is lonely
+          <View style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: THEME.spacing.xxl,
+          }}>
+            <Text style={{
+              color: THEME.text.secondary,
+              fontSize: 18,
+              fontFamily: 'SpaceMono',
+              textAlign: 'center',
+            }}>
+              No items found
             </Text>
-            <Text className="text-secondary text-lg mb-8 text-center px-8">
-              Start adding ingredients to keep track of your food and get recipe suggestions!
-            </Text>
-            <TouchableOpacity
-              onPress={() => router.push({ pathname: "/add-item" })}
-              className="bg-primary px-8 py-4 rounded-full flex-row items-center"
-            >
-              <Plus size={20} color="white" />
-              <Text className="text-white font-semibold ml-2">Add Your First Item</Text>
-            </TouchableOpacity>
           </View>
         }
       />
-      <View className="absolute bottom-4 right-4 flex-row">
-        <TouchableOpacity
-          onPress={handleGetRecipes}
-          className="bg-accent p-4 rounded-full mr-4"
-        >
-          <ChefHat size={24} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => router.push({ pathname: "/add-item" })}
-          className="bg-primary p-4 rounded-full"
-        >
-          <Plus size={24} color="white" />
-        </TouchableOpacity>
-      </View>
-    </View>
+
+      {/* Floating Action Button */}
+      <TouchableOpacity
+        onPress={openCamera}
+        style={{
+          position: 'absolute',
+          bottom: THEME.spacing.xl,
+          right: THEME.spacing.lg,
+          backgroundColor: THEME.accent,
+          width: 56,
+          height: 56,
+          borderRadius: 28,
+          justifyContent: 'center',
+          alignItems: 'center',
+          shadowColor: THEME.accent,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 8,
+        }}
+      >
+        <Camera size={24} color={THEME.background} />
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 }

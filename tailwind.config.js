@@ -16,14 +16,14 @@ module.exports = {
         },
         // Neon Colors
         neon: {
-          green: '#39FF14',
+          green: '#8EFF71',
           cyan: '#00F3FF',
           pink: '#FF00FF',
           purple: '#9D00FF',
           yellow: '#FFFF00',
         },
         // Legacy colors for compatibility
-        primary: "#39FF14",
+        primary: "#8EFF71",
         secondary: "#00F3FF",
         accent: "#FF00FF",
         background: "#050505",
@@ -32,7 +32,7 @@ module.exports = {
         border: "#333",
       },
       boxShadow: {
-        'neon-green': '0 0 20px #39FF14',
+        'neon-green': '0 0 20px #8EFF71',
         'neon-cyan': '0 0 20px #00F3FF',
         'neon-pink': '0 0 20px #FF00FF',
         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',

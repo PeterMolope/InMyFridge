@@ -1,19 +1,21 @@
 import {
   DarkTheme,
-  DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import "../global.css";
 
-import { ThemeProvider as CustomThemeProvider, useTheme } from "../src/context/ThemeContext";
+import { SplashScreen as CustomSplashScreen } from "../src/components/SplashScreen";
 import { QueryProvider } from "../src/providers/QueryProvider";
+import { NeonThemeProvider } from "../src/theme/NeonTheme";
+import { THEME } from "../src/theme/theme";
+import { SystemUIManager } from "../src/utils/SystemUIManager";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -32,38 +34,55 @@ export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+  const [showCustomSplash, setShowCustomSplash] = useState(true);
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+  const handleSplashComplete = () => {
+    setShowCustomSplash(false);
+    // Hide the native splash screen after custom splash completes
+    SplashScreen.hideAsync();
+  };
 
   if (!loaded) {
     return null;
   }
 
+  if (showCustomSplash) {
+    return (
+      <QueryProvider>
+        <NeonThemeProvider>
+          <CustomSplashScreen onComplete={handleSplashComplete} />
+        </NeonThemeProvider>
+      </QueryProvider>
+    );
+  }
+
   return (
     <QueryProvider>
-      <CustomThemeProvider>
+      <NeonThemeProvider>
         <RootLayoutNav />
-      </CustomThemeProvider>
+      </NeonThemeProvider>
     </QueryProvider>
   );
 }
 
 function RootLayoutNav() {
-  const { theme } = useTheme();
+  // Initialize system UI for dark mode
+  useEffect(() => {
+    SystemUIManager.setDarkMode();
+  }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
-      <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
+    <SafeAreaView 
+      style={{ flex: 1, backgroundColor: THEME.background }} 
+      edges={SystemUIManager.getSafeAreaEdges()}
+    >
+      <StatusBar style="light" backgroundColor={THEME.background} />
+      <ThemeProvider value={DarkTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: "modal" }} />

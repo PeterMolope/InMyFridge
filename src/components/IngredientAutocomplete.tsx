@@ -29,7 +29,7 @@ const IngredientAutocomplete: React.FC<IngredientAutocompleteProps> = ({
   // In a production app, this should be stored securely
   // For demo purposes, we'll use environment variables or secure storage
   const API_KEY = process.env.EXPO_PUBLIC_SPOONACULAR_API_KEY;
-  const API_BASE_URL = 'https://api.spoonacular.com/food/ingredients/autocomplete';
+  const API_BASE_URL = `${process.env.EXPO_PUBLIC_SPOONACULAR_API_URL || 'https://api.spoonacular.com'}/food/ingredients/autocomplete`;
 
   const searchIngredients = debounce(async (searchQuery: string) => {
     if (!searchQuery.trim() || searchQuery.length < 2) {
