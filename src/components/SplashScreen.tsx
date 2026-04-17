@@ -9,7 +9,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { ChefHat } from 'lucide-react-native';
 import React, { useEffect, useRef } from 'react';
-import { Animated, Dimensions, Easing, View } from 'react-native';
+import { Animated, Dimensions, View } from 'react-native';
 import { useFridgeStore } from '../context/fridgeStore';
 import { useNeonTheme } from '../theme/NeonTheme';
 
@@ -24,57 +24,44 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   const initializeItems = useFridgeStore((state) => state.initializeItems);
 
   // Animation values
-  const masterAnim = useRef(new Animated.Value(0)).current; // 0 to 1 for entrance
-  const glowAnim = useRef(new Animated.Value(0)).current;   // 0 to 1 for breathing loop
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
   useEffect(() => {
     let isMounted = true;
 
-    const runAnimations = async () => {
+    const initializeApp = async () => {
       try {
-        // 1. Start App Initialization
+        // Initialize app data
         await initializeItems();
 
-        // 2. Entrance Animation (Opacity and Scale)
-        Animated.timing(masterAnim, {
-          toValue: 1,
-          duration: 800,
-          easing: Easing.out(Easing.back(1.5)),
-          useNativeDriver: true,
-        }).start();
+        // Animate in
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.spring(scaleAnim, {
+            toValue: 1,
+            tension: 50,
+            friction: 7,
+            useNativeDriver: true,
+          })
+        ]).start();
 
-        // 3. Start Breathing Glow Loop separately
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(glowAnim, {
-              toValue: 1,
-              duration: 1500,
-              easing: Easing.inOut(Easing.sin),
-              useNativeDriver: true, // shadowOpacity doesn't support native driver, but scale does
-            }),
-            Animated.timing(glowAnim, {
-              toValue: 0,
-              duration: 1500,
-              easing: Easing.inOut(Easing.sin),
-              useNativeDriver: true,
-            }),
-          ])
-        ).start();
-
-        // 4. Wait for 10 seconds (Testing delay)
+        // Show splash for 3 seconds to ensure app fully loads
         setTimeout(() => {
           if (!isMounted) return;
-
-          // 5. Exit Animation
-          Animated.timing(masterAnim, {
+          
+          Animated.timing(fadeAnim, {
             toValue: 0,
-            duration: 600,
-            easing: Easing.in(Easing.exp),
+            duration: 400,
             useNativeDriver: true,
           }).start(() => {
             onComplete();
           });
-        }, 5000);
+        }, 3000);
 
       } catch (error) {
         console.error('Initialization failed', error);
@@ -82,20 +69,9 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       }
     };
 
-    runAnimations();
+    initializeApp();
     return () => { isMounted = false; };
   }, []);
-
-  // Interpolations for smoother control
-  const mainScale = masterAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.8, 1],
-  });
-
-  const breathScale = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.05], // Subtle pulse
-  });
 
   return (
     <View
@@ -125,10 +101,9 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           shadowOpacity: 0.5, 
           shadowRadius: 20,
           elevation: 20,
-          opacity: masterAnim,
+          opacity: fadeAnim,
           transform: [
-            { scale: mainScale },
-            { scale: breathScale }
+            { scale: scaleAnim }
           ],
         }}
       >
